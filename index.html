@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Sambang Zakat Gresik</title>
+<meta name="description" content="Media pembelajaran imersif VR/AR + Generative AI untuk mata kuliah Filantropi Islam: zakat dan 8 asnaf di Pasar Bandeng Gresik.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/aframe@1.6.0/dist/aframe-v1.6.0.min.js"></script>
+<style>
+/*
+VOICE: hangat, sabar, seperti kiai kampung yang mengajak santri sambang pasar di malam akhir Ramadan.
+IDEA: Pasar Bandeng Gresik malam songolikur — tiap lapak adalah satu kasus zakat yang harus dianalisis.
+PICTURE: dunia 3D malam pasar: gapura paduraksa bata merah, lapak beratap limasan, lampion, masjid, bulan sabit.
+COLOUR and TYPE: malam hijau-laut tua, bata terakota, perak bandeng, aksen kunyit; Lexend untuk keterbacaan, Amiri untuk dalil.
+LAYOUT: dunia 3D penuh layar; HUD tipis di atas; panel misi di kanan (lembar bawah di ponsel); laci Mbah Yai AI.
+*/
+:root{color-scheme:dark;--night:#0b2326;--night2:#123438;--brick:#b4532f;--brick2:#8e3d22;--silver:#d7e1e2;--kunyit:#f2b632;--ink:#f4efe6;--muted:#a9bdbd;--ok:#5fd08a;--bad:#ff7a66;--card:rgba(9,30,33,.94);--line:rgba(215,225,226,.16)}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;height:100%;background:var(--night);color:var(--ink);font:16px/1.55 Lexend,system-ui,sans-serif;overflow:hidden}
+body.ar{background:transparent}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--kunyit);outline-offset:2px}
+.ar-bg{position:fixed;inset:0;z-index:-1;width:100%;height:100%;object-fit:cover;display:none;background:radial-gradient(circle at 50% 40%,#3a5458,#0b2326)}
+body.ar .ar-bg.on{display:block}
+/* HUD */
+.hud{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;gap:10px;align-items:center;padding:10px max(12px,env(safe-area-inset-left));background:linear-gradient(#071a1ccc,#071a1c00);pointer-events:none}
+.hud>*{pointer-events:auto}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.2px;margin-right:auto}
+.brand svg{flex:none}
+.brand small{display:block;font-weight:400;color:var(--muted);font-size:13px;line-height:1.1}
+.kendi{display:flex;gap:4px;align-items:center;background:#0009;border:1px solid var(--line);border-radius:999px;padding:6px 10px}
+.coin{width:14px;height:14px;border-radius:50%;background:#ffffff1f;border:1px solid #ffffff33}
+.coin.on{background:radial-gradient(circle at 35% 35%,#ffe9a8,var(--kunyit) 55%,#a57412);border-color:#ffe39a;box-shadow:0 0 8px #f2b63299}
+.pill{display:inline-flex;align-items:center;gap:6px;background:#0009;border:1px solid var(--line);border-radius:999px;padding:7px 12px;font-size:13px;min-height:36px;white-space:nowrap}
+.pill i{width:8px;height:8px;border-radius:50%;background:#999;display:inline-block}
+.pill.claude i,.pill.puter i{background:var(--ok);box-shadow:0 0 6px var(--ok)}
+.pill.offline i{background:var(--kunyit)}
+.ibtn{min-width:44px;min-height:44px;border-radius:12px;border:1px solid var(--line);background:#000a;display:grid;place-items:center;padding:0 12px}
+.ibtn:hover{background:#ffffff14}
+/* dock */
+.dock{position:fixed;left:max(12px,env(safe-area-inset-left));bottom:max(12px,env(safe-area-inset-bottom));z-index:20;display:flex;flex-wrap:wrap;gap:8px;max-width:min(620px,calc(100vw - 24px))}
+.dock button{min-height:44px;border-radius:12px;border:1px solid var(--line);background:var(--card);padding:8px 12px;display:flex;align-items:center;gap:8px;font-size:14px}
+.dock button.done{border-color:#5fd08a88}
+.dock button .n{width:24px;height:24px;border-radius:7px;background:var(--brick);display:grid;place-items:center;font-weight:700;font-size:13px}
+.dock button.done .n{background:var(--ok);color:#06210f}
+.dock .main{background:var(--kunyit);color:#2a1a00;font-weight:700;border-color:transparent}
+/* panel */
+.panel{position:fixed;z-index:30;top:64px;right:12px;bottom:12px;width:min(470px,calc(100vw - 24px));background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 20px 60px #0008;display:none;flex-direction:column;overflow:hidden;backdrop-filter:blur(8px)}
+.panel.open{display:flex}
+.phead{display:flex;gap:12px;align-items:flex-start;padding:16px 16px 12px;border-bottom:1px solid var(--line);background:linear-gradient(135deg,#8e3d2255,transparent)}
+.phead h2{font-size:20px;line-height:1.15;margin:0 0 2px}
+.phead p{margin:0;color:var(--muted);font-size:14px}
+.avatar{flex:none;width:52px;height:52px;border-radius:14px;display:grid;place-items:center;background:var(--brick2)}
+.pbody{overflow:auto;padding:14px 16px 18px;flex:1}
+.close{margin-left:auto;flex:none}
+.story{background:#ffffff0d;border-left:3px solid var(--kunyit);border-radius:0 12px 12px 0;padding:10px 12px;margin:0 0 12px}
+.story b{color:var(--kunyit)}
+table.data{width:100%;border-collapse:collapse;font-size:14px;margin:6px 0 12px}
+table.data td{padding:7px 4px;border-bottom:1px solid var(--line);vertical-align:top}
+table.data td:last-child{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.dalil{border:1px solid #f2b63244;background:#f2b6320d;border-radius:12px;padding:10px 12px;margin:0 0 12px}
+.dalil .ar{font-family:Amiri,serif;font-size:22px;line-height:1.9;text-align:right;direction:rtl}
+.dalil .tr{font-size:13.5px;color:#e6dccb;margin-top:4px}
+.dalil .src{font-size:13px;color:var(--muted);margin-top:4px}
+details.dalil summary{cursor:pointer;font-weight:500;color:var(--kunyit);min-height:32px}
+.q{display:grid;gap:10px;margin:8px 0 12px}
+.q label{display:grid;gap:4px;font-size:14px;color:#dfe8e8}
+.q .row{display:flex;align-items:center;gap:8px}
+.q input,.q select{width:100%;min-height:44px;border-radius:10px;border:1px solid #ffffff2e;background:#00000055;padding:8px 12px;font-size:16px}
+.q .unit{flex:none;color:var(--muted);font-size:14px;width:44px}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.btn{min-height:44px;border-radius:12px;padding:8px 14px;border:1px solid var(--line);background:#ffffff10;display:inline-flex;align-items:center;gap:8px;font-size:14.5px}
+.btn:hover{background:#ffffff1c}
+.btn.pri{background:var(--kunyit);color:#2a1a00;border-color:transparent;font-weight:700}
+.btn.brick{background:var(--brick);border-color:transparent;font-weight:500}
+.btn[disabled]{opacity:.55;cursor:progress}
+.fb{border-radius:12px;padding:12px;margin:10px 0;font-size:14.5px}
+.fb.ok{background:#5fd08a1c;border:1px solid #5fd08a66}
+.fb.bad{background:#ff7a661a;border:1px solid #ff7a6666}
+.fb ol{margin:6px 0 0;padding-left:20px}
+.ai{background:#7bd3e014;border:1px solid #7bd3e055;border-radius:12px;padding:12px;margin:10px 0;font-size:14.5px;white-space:pre-wrap}
+.ai .who{display:flex;align-items:center;gap:6px;font-weight:700;color:#9fe3ec;margin-bottom:4px;white-space:normal}
+.tag{display:inline-block;font-size:12.5px;padding:2px 8px;border-radius:999px;background:#ffffff14;color:var(--muted)}
+.note{font-size:13px;color:var(--muted)}
+.cards{display:grid;gap:8px}
+.mcard{border:1px solid var(--line);border-radius:12px;padding:10px;background:#ffffff08}
+.mcard p{margin:0 0 6px;font-size:14px}
+.mcard select{width:100%;min-height:44px;border-radius:10px;background:#0006;border:1px solid #ffffff2e;padding:8px;font-size:16px}
+.mcard.ok{border-color:#5fd08a88}.mcard.bad{border-color:#ff7a6688}
+/* chat */
+.chat .msgs{display:flex;flex-direction:column;gap:8px}
+.bubble{max-width:88%;padding:9px 12px;border-radius:14px;font-size:14.5px;white-space:pre-wrap}
+.bubble.me{align-self:flex-end;background:var(--brick);border-bottom-right-radius:4px}
+.bubble.yai{align-self:flex-start;background:#ffffff12;border-bottom-left-radius:4px}
+.chatbar{display:flex;gap:8px;padding:10px 12px;border-top:1px solid var(--line)}
+.chatbar[hidden]{display:none}
+.chatbar input{flex:1;min-height:44px;border-radius:12px;border:1px solid #ffffff2e;background:#00000055;padding:8px 12px;font-size:16px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chips button{border-radius:999px;border:1px solid var(--line);background:#ffffff0d;padding:6px 10px;font-size:13px;min-height:36px}
+/* modal */
+.modal{position:fixed;inset:0;z-index:50;display:none;place-items:center;background:#03100fcc;padding:16px}
+.modal.open{display:grid}
+.mbox{width:min(760px,100%);max-height:calc(100vh - 32px);overflow:auto;background:var(--night2);border:1px solid var(--line);border-radius:20px;box-shadow:0 30px 80px #000a}
+.hero{position:relative;padding:26px 24px 18px;background:radial-gradient(120% 90% at 85% 0%,#b4532f88,transparent 60%),linear-gradient(160deg,#123438,#0b2326)}
+.hero h1{font-size:clamp(30px,5vw,46px);line-height:1.05;margin:0 0 8px;text-wrap:balance}
+.hero p{margin:0;max-width:60ch;color:#dfe8e8}
+.hero .ar{font-family:Amiri,serif;font-size:22px;color:var(--kunyit);direction:rtl;text-align:right;margin-bottom:6px}
+.mcontent{padding:18px 24px 24px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:12px 0}
+.mode{border:1px solid var(--line);border-radius:14px;padding:14px;background:#ffffff08;text-align:left;display:grid;gap:6px;align-content:start}
+.mode:hover{border-color:var(--kunyit);background:#f2b63212}
+.mode b{font-size:17px}
+.mode span{font-size:13.5px;color:var(--muted)}
+.obj{margin:10px 0;padding-left:20px;font-size:14.5px}
+.obj li{margin:3px 0}
+/* AR controls */
+.arbar{position:fixed;z-index:25;left:50%;transform:translateX(-50%);bottom:max(14px,env(safe-area-inset-bottom));display:none;flex-direction:column;gap:8px;align-items:center;width:min(640px,calc(100vw - 24px))}
+body.ar .arbar{display:flex}
+body.ar .dock{display:none}
+.arcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:10px 12px;width:100%}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{flex:1;min-height:44px;border-radius:10px;border:1px solid var(--line);background:#ffffff0d;font-size:14px}
+.seg button.on{background:var(--kunyit);color:#2a1a00;font-weight:700}
+.arinfo{font-size:14px;margin-top:8px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.arinfo input[type=range]{flex:1;min-width:140px;accent-color:var(--kunyit)}
+.toast{position:fixed;z-index:60;left:50%;top:70px;transform:translateX(-50%);background:#071a1cf0;border:1px solid var(--kunyit);border-radius:12px;padding:10px 16px;font-size:14.5px;display:none;max-width:calc(100vw - 24px)}
+.toast.on{display:block;animation:pop .35s ease}
+@keyframes pop{from{transform:translate(-50%,-8px);opacity:0}}
+@media (prefers-reduced-motion:reduce){.toast.on{animation:none}}
+body.panel-open .a-enter-vr,body.panel-open .a-enter-ar{display:none}
+@media(max-width:700px){
+ .panel{top:auto;left:8px;right:8px;width:auto;height:min(64vh,640px);bottom:8px;border-radius:18px}
+ .grid3{grid-template-columns:minmax(0,1fr)}
+ .brand small{display:none}
+ .dock{max-width:calc(100vw - 24px)}
+ .dock button .lbl{display:none}
+ .hud .pill .t{display:none}
+}
+</style>
+</head>
+<body>
+<video id="arVideo" class="ar-bg" playsinline muted autoplay></video>
+<img id="arPhoto" class="ar-bg" alt="">
+<div id="arPlain" class="ar-bg"></div>
+
+<header class="hud">
+ <div class="brand">
+  <svg width="38" height="38" viewBox="0 0 38 38" aria-hidden="true"><path d="M4 34V22h4v-5h4v-5h14v5h4v5h4v12H23V24a4 4 0 0 0-8 0v10Z" fill="#b4532f"/><path d="M12 12h14l-7-8Z" fill="#f2b632"/><ellipse cx="19" cy="30" rx="6" ry="2.4" fill="#d7e1e2"/></svg>
+  <div>Sambang Zakat<small>Lab Imersif Filantropi · Pasar Bandeng Gresik</small></div>
+ </div>
+ <div class="kendi" id="kendi" title="Kendi amal: koin terkumpul per misi" aria-label="Progres misi"></div>
+ <span class="pill offline" id="aiPill" title="Status Generative AI"><i></i><span class="t" id="aiTxt">AI: menghubungkan…</span></span>
+ <button class="ibtn" id="sndBtn" aria-label="Musik gamelan latar" title="Musik gamelan latar">♪</button>
+ <button class="ibtn" id="helpBtn" aria-label="Menu dan petunjuk" title="Menu">☰</button>
+</header>
+
+<nav class="dock" id="dock" aria-label="Daftar misi"></nav>
+
+<div class="arbar" id="arbar">
+ <div class="arcard">
+  <div class="seg" id="arSeg">
+   <button data-o="fitrah" class="on">Karung Fitrah</button>
+   <button data-o="asnaf">Roda 8 Asnaf</button>
+   <button data-o="emas">Nisab Emas</button>
+  </div>
+  <div class="arinfo" id="arInfo"></div>
+  <div class="arinfo"><span class="note">Seret untuk memutar · gulir/cubit untuk memperbesar</span><button class="btn" id="arPhotoBtn">Foto latar</button><button class="btn brick" id="arExit">Kembali ke VR</button></div>
+ </div>
+</div>
+<input type="file" id="arFile" accept="image/*" capture="environment" hidden>
+
+<aside class="panel" id="panel" aria-live="polite">
+ <div class="phead"><div class="avatar" id="pAv"></div><div><h2 id="pTitle"></h2><p id="pSub"></p></div><button class="ibtn close" id="pClose" aria-label="Tutup panel">✕</button></div>
+ <div class="pbody" id="pBody"></div>
+ <div class="chatbar" id="chatbar" hidden><input id="chatIn" placeholder="Tanya Mbah Yai tentang zakat…" aria-label="Pertanyaan untuk Mbah Yai"><button class="btn pri" id="chatSend">Kirim</button></div>
+</aside>
+
+<div class="modal open" id="intro" role="dialog" aria-modal="true" aria-labelledby="introT">
+ <div class="mbox">
+  <div class="hero">
+   <div class="ar" lang="ar">خُذْ مِنْ أَمْوَالِهِمْ صَدَقَةً تُطَهِّرُهُمْ وَتُزَكِّيهِم بِهَا</div>
+   <h1 id="introT">Sambang Zakat di Pasar Bandeng Gresik</h1>
+   <p>Malam songolikur. Lampion menyala di sepanjang lapak, para penambak memamerkan bandeng kawak, dan warga bersiap menunaikan zakat. Kunjungi enam lapak, dengarkan kisah tiap muzaki dan mustahik, lalu analisis dan hitung zakatnya bersama <b>Mbah Yai</b>, pembimbing AI.</p>
+  </div>
+  <div class="mcontent">
+   <b>Capaian pembelajaran (Filantropi Islam)</b>
+   <ol class="obj">
+    <li>Menganalisis syarat wajib zakat (nisab, haul, kadar) pada kasus nyata ekonomi Gresik.</li>
+    <li>Menghitung zakat fitrah, zakat penghasilan, emas, pertanian, dan usaha tambak.</li>
+    <li>Mengklasifikasikan mustahik ke dalam 8 asnaf (QS. at-Taubah: 60) beserta alasannya.</li>
+    <li>Merefleksikan teladan filantropi Wali Songo Gresik untuk tata kelola zakat lokal.</li>
+   </ol>
+   <div class="grid3">
+    <button class="mode" id="goVR"><b>Masuk Pasar (VR)</b><span>Jelajahi pasar 3D. Klik lapak atau penanda emas. Tombol VR muncul bila perangkat mendukung headset/Cardboard.</span></button>
+    <button class="mode" id="goAR"><b>Mode AR</b><span>Hadirkan karung fitrah, roda 8 asnaf, dan batang emas nisab di atas meja Anda lewat kamera atau foto.</span></button>
+    <button class="mode" id="goYai"><b>Tanya Mbah Yai</b><span>Ngobrol dengan tutor AI berlogat Gresik yang membimbing dengan pertanyaan, bukan jawaban instan.</span></button>
+   </div>
+   <p class="note">Kontrol: seret layar untuk melihat sekeliling · W A S D / tombol panah untuk berjalan · klik lapak untuk membuka misi. Angka acuan: SK Ketua BAZNAS No. 14/2026 (fitrah) dan No. 15/2026 (nisab penghasilan). Harga emas di kasus adalah asumsi; ganti dengan harga hari ini.</p>
+  </div>
+ </div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<a-scene id="scene" renderer="alpha:true;antialias:true;colorManagement:true" xr-mode-ui="enabled:true;XRMode:xr" cursor="rayOrigin:mouse" raycaster="objects:.clickable;far:60" loading-screen="dotsColor:#f2b632;backgroundColor:#0b2326" fog="type:exponential;color:#0b2326;density:0.025">
+ <a-entity id="sky" hide-on-enter-ar geometry="primitive:sphere;radius:90;segmentsWidth:24;segmentsHeight:12" material="shader:flat;side:back;color:#0d2a30;fog:false"></a-entity>
+ <a-entity id="stars" hide-on-enter-ar></a-entity>
+ <a-entity light="type:hemisphere;color:#9fc7d0;groundColor:#2a1610;intensity:0.75"></a-entity>
+ <a-entity light="type:directional;color:#c9dcff;intensity:0.35" position="-6 10 4"></a-entity>
+ <a-entity id="vrWorld"></a-entity>
+ <a-entity id="arWorld" visible="false" position="0 1.1 -1.8"></a-entity>
+ <a-entity id="rig" position="0 0 8">
+  <a-entity id="cam" camera look-controls="magicWindowTrackingEnabled:false;reverseMouseDrag:false" wasd-controls="acceleration:28" position="0 1.6 0">
+   <a-entity id="gaze" position="0 0 -1" cursor="fuse:true;fuseTimeout:1500" raycaster="objects:.clickable;enabled:false;far:40" geometry="primitive:ring;radiusInner:0.012;radiusOuter:0.02" material="color:#f2b632;shader:flat" visible="false"></a-entity>
+  </a-entity>
+  <a-entity laser-controls="hand:right" raycaster="objects:.clickable;far:40"></a-entity>
+ </a-entity>
+</a-scene>
+
+<script>
+{
+/* ================= DATA & ACUAN ================= */
+const ACUAN={fitrahKg:2.5,fitrahLiter:3.5,fitrahRp:50000,nisabGaji:7640144,nisabGajiThn:91681728,nisabEmasG:85,nisabGabah:653,kadar:0.025};
+const rp=n=>'Rp'+Math.round(n).toLocaleString('id-ID');
+const kg=n=>(Math.round(n*100)/100).toLocaleString('id-ID')+' kg';
+const gr=n=>(Math.round(n*100)/100).toLocaleString('id-ID')+' g';
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const md=s=>esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>');
+const $=id=>document.getElementById(id);
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const rnd=(a,b,step=1)=>Math.round((a+Math.random()*(b-a))/step)*step;
+
+const FITRAH_TYPES={
+ dewasa:{wajib:true,why:'Muslim yang hidup pada saat terbenam matahari akhir Ramadan.'},
+ anak:{wajib:true,why:'Anak kecil tetap wajib; dibayarkan oleh wali yang menanggung nafkahnya.'},
+ bayi_sebelum:{wajib:true,why:'Lahir sebelum terbenam matahari hari terakhir Ramadan, sehingga mendapati sebagian Ramadan dan awal Syawal.'},
+ bayi_sesudah:{wajib:false,why:'Lahir setelah terbenam matahari malam 1 Syawal: tidak wajib (sunah menurut sebagian ulama).'},
+ wafat_sebelum:{wajib:false,why:'Wafat sebelum terbenam matahari akhir Ramadan: tidak lagi terkena kewajiban.'},
+ ditanggung_lain:{wajib:false,why:'Zakatnya sudah ditunaikan oleh wali/keluarga yang menanggung nafkahnya.'}
+};
+const ASNAF=[
+ {k:'fakir',n:'Fakir',d:'Tidak memiliki harta/penghasilan yang mencukupi separuh kebutuhan pokok.',c:'#e0744a'},
+ {k:'miskin',n:'Miskin',d:'Punya penghasilan, tetapi belum mencukupi kebutuhan pokok.',c:'#e9a23b'},
+ {k:'amil',n:'Amil',d:'Petugas yang ditunjuk untuk menghimpun, mengelola, dan menyalurkan zakat.',c:'#c9b458'},
+ {k:'mualaf',n:'Mualaf',d:'Orang yang baru masuk Islam atau yang hatinya perlu dilunakkan.',c:'#7fc06b'},
+ {k:'riqab',n:'Riqab',d:'Memerdekakan budak; kini dimaknai juga membebaskan korban perbudakan modern/perdagangan orang.',c:'#4fb3a6'},
+ {k:'gharimin',n:'Gharimin',d:'Berutang untuk kebutuhan halal yang mendesak dan tidak mampu melunasinya.',c:'#5a9bd8'},
+ {k:'fisabilillah',n:'Fi Sabilillah',d:'Di jalan Allah: dakwah, pendidikan agama, dan kemaslahatan umat (cakupannya diperselisihkan).',c:'#9a7ad8'},
+ {k:'ibnusabil',n:'Ibnu Sabil',d:'Musafir (perjalanan yang bukan maksiat) yang kehabisan bekal.',c:'#d672a8'}
+];
+const DALIL={
+ fitrah:{ar:'فَرَضَ رَسُولُ اللَّهِ صلى الله عليه وسلم زَكَاةَ الْفِطْرِ صَاعًا مِنْ تَمْرٍ أَوْ صَاعًا مِنْ شَعِيرٍ عَلَى الْعَبْدِ وَالْحُرِّ وَالذَّكَرِ وَالْأُنْثَى وَالصَّغِيرِ وَالْكَبِيرِ مِنَ الْمُسْلِمِينَ',tr:'“Rasulullah ﷺ mewajibkan zakat fitrah satu sha‘ kurma atau satu sha‘ gandum atas hamba sahaya dan orang merdeka, laki-laki dan perempuan, anak kecil dan orang dewasa dari kaum muslimin.”',src:'HR. al-Bukhari no. 1503 dan Muslim no. 984, dari Ibnu ‘Umar. Di Indonesia 1 sha‘ dikonversi menjadi 2,5 kg / 3,5 liter beras (SK Ketua BAZNAS No. 14/2026).'},
+ usaha:{ar:'يَا أَيُّهَا الَّذِينَ آمَنُوا أَنفِقُوا مِن طَيِّبَاتِ مَا كَسَبْتُمْ وَمِمَّا أَخْرَجْنَا لَكُم مِّنَ الْأَرْضِ',tr:'“Wahai orang-orang yang beriman, infakkanlah sebagian dari hasil usahamu yang baik-baik dan sebagian dari apa yang Kami keluarkan dari bumi untukmu.”',src:'QS. al-Baqarah: 267. Rumus zakat perniagaan: (aset lancar + piutang lancar − utang jatuh tempo) × 2,5%, bila ≥ nisab 85 g emas dan genap haul. Aset tetap (kolam, kincir, pompa) tidak dihitung.'},
+ tani:{ar:'فِيمَا سَقَتِ السَّمَاءُ وَالْعُيُونُ أَوْ كَانَ عَثَرِيًّا الْعُشْرُ، وَمَا سُقِيَ بِالنَّضْحِ نِصْفُ الْعُشْرِ',tr:'“Tanaman yang diairi hujan dan mata air, atau yang menyerap air sendiri, zakatnya sepersepuluh; yang diairi dengan alat (tenaga/biaya) zakatnya seperdua puluh.”',src:'HR. al-Bukhari no. 1483, dari Ibnu ‘Umar. Nisab 5 wasaq ≈ 653 kg gabah (± 520 kg beras); dikeluarkan setiap panen, tanpa haul.'},
+ gaji:{ar:'يَا أَيُّهَا الَّذِينَ آمَنُوا أَنفِقُوا مِن طَيِّبَاتِ مَا كَسَبْتُمْ',tr:'“Wahai orang-orang yang beriman, infakkanlah sebagian dari hasil usahamu yang baik-baik.”',src:'QS. al-Baqarah: 267; Fatwa MUI No. 3 Tahun 2003. Nisab 2026: Rp7.640.144/bulan (SK Ketua BAZNAS No. 15/2026), 2,5% dari penghasilan bruto.'},
+ emas:{ar:'وَالَّذِينَ يَكْنِزُونَ الذَّهَبَ وَالْفِضَّةَ وَلَا يُنفِقُونَهَا فِي سَبِيلِ اللَّهِ فَبَشِّرْهُم بِعَذَابٍ أَلِيمٍ',tr:'“Orang-orang yang menyimpan emas dan perak dan tidak menginfakkannya di jalan Allah, beritahukanlah kepada mereka azab yang pedih.”',src:'QS. at-Taubah: 34. Nisab emas 20 dinar ≈ 85 g (HR. Abu Dawud no. 1573), haul 1 tahun, kadar 2,5%. Perhiasan yang dipakai wajar: tidak wajib menurut jumhur (Syafi‘i, Maliki, Hanbali); wajib menurut Hanafi.'},
+ asnaf:{ar:'إِنَّمَا الصَّدَقَاتُ لِلْفُقَرَاءِ وَالْمَسَاكِينِ وَالْعَامِلِينَ عَلَيْهَا وَالْمُؤَلَّفَةِ قُلُوبُهُمْ وَفِي الرِّقَابِ وَالْغَارِمِينَ وَفِي سَبِيلِ اللَّهِ وَابْنِ السَّبِيلِ ۖ فَرِيضَةً مِّنَ اللَّهِ ۗ وَاللَّهُ عَلِيمٌ حَكِيمٌ',tr:'“Sesungguhnya zakat itu hanyalah untuk orang-orang fakir, miskin, amil zakat, yang dilunakkan hatinya (mualaf), untuk (memerdekakan) hamba sahaya, untuk (membebaskan) orang yang berutang, untuk jalan Allah, dan untuk orang yang sedang dalam perjalanan, sebagai kewajiban dari Allah. Allah Maha Mengetahui, Mahabijaksana.”',src:'QS. at-Taubah: 60.'}
+};
+
+/* ---- definisi enam stasiun ---- */
+const ST=[
+ {id:'fitrah',no:1,t:'Zakat Fitrah',npc:'Pak Hasan',role:'Penjual pudak & otak-otak bandeng',col:'#b4532f',goods:'pudak',
+  base:()=>({nama:'Pak Hasan',cerita:'“Le, Nduk, besok sudah Riyoyo. Saya mau bayar fitrah sekeluarga lewat amil masjid. Tolong bantu hitung, siapa saja yang wajib dan berapa berasnya.”',nilai:50000,anggota:[
+   {n:'Pak Hasan (kepala keluarga)',t:'dewasa'},{n:'Bu Aminah (istri)',t:'dewasa'},{n:'Mbah Sri (ibu, ditanggung nafkahnya)',t:'dewasa'},{n:'Rafi, 9 tahun',t:'anak'},{n:'Nisa, 5 tahun',t:'anak'},{n:'Bayi Zahra, lahir 29 Ramadan pukul 16.00',t:'bayi_sebelum'},{n:'Keponakan yang menginap (fitrahnya sudah dibayar bapaknya)',t:'ditanggung_lain'}]})},
+ {id:'usaha',no:2,t:'Zakat Usaha Tambak',npc:'Pak Darmo',role:'Juragan tambak bandeng, Manyar',col:'#4fb3a6',goods:'bandeng',
+  base:()=>({nama:'Pak Darmo',cerita:'“Bandeng kawak saya juara kontes tadi malam! Usaha tambak ini sudah genap setahun. Hartanya apa saja yang dihitung zakat?”',kas:45000000,persediaan:150000000,piutang:15000000,utang:20000000,asetTetap:300000000,hargaEmas:2000000})},
+ {id:'tani',no:3,t:'Zakat Pertanian',npc:'Mbah Kasan',role:'Petani padi, Balongpanggang',col:'#7fc06b',goods:'padi',
+  base:()=>({nama:'Mbah Kasan',cerita:'“Alhamdulillah panen tahun ini bagus. Sawah saya diairi pompa diesel sewaan, bayar tiap musim. Zakatnya berapa, Nduk?”',panen:2400,air:'irigasi'})},
+ {id:'gaji',no:4,t:'Zakat Penghasilan',npc:'Mbak Laila',role:'Staf administrasi di kawasan industri Gresik',col:'#5a9bd8',goods:'kantor',
+  base:()=>({nama:'Mbak Laila',cerita:'“Gaji saya cair tiap bulan. Ada cicilan motor juga. Apakah cicilan itu mengurangi zakat saya?”',gaji:8200000,tunjangan:1300000,cicilan:1500000})},
+ {id:'emas',no:5,t:'Zakat Emas Simpanan',npc:'Bu Siti',role:'Pengrajin songkok & tenun sarung',col:'#f2b632',goods:'songkok',
+  base:()=>({nama:'Bu Siti',cerita:'“Hasil jualan songkok saya tabung dalam emas batangan untuk biaya haji, sudah setahun lebih. Kalung yang saya pakai sehari-hari apa ikut dihitung?”',simpan:110,pakai:25,haul:true,hargaEmas:2000000})},
+ {id:'asnaf',no:6,t:'Lumbung 8 Asnaf',npc:'Ustazah Nur',role:'Amil Masjid Jami’ — pos penyaluran',col:'#9a7ad8',goods:'lumbung',
+  base:()=>({nama:'Ustazah Nur',cerita:'“Zakat sudah terkumpul. Sekarang tugas kita menyalurkan dengan adil. Tolong tentukan setiap calon penerima masuk asnaf yang mana, beserta alasannya.”',kartu:[
+   {d:'Mbok Yem, janda lansia di Kroman, tidak punya penghasilan dan hidup dari belas kasihan tetangga.',a:'fakir'},
+   {d:'Pak Udin, nelayan kecil Ujungpangkah; hasil melautnya hanya cukup untuk sebagian kebutuhan keluarga.',a:'miskin'},
+   {d:'Panitia zakat masjid yang ditunjuk takmir untuk mendata, menimbang beras, dan membagikan zakat.',a:'amil'},
+   {d:'Mas Yohan, baru bersyahadat bulan lalu dan dijauhi sebagian keluarganya.',a:'mualaf'},
+   {d:'Pekerja migran asal Gresik yang dijerat agen ilegal di luar negeri dan butuh biaya untuk dibebaskan serta dipulangkan.',a:'riqab'},
+   {d:'Pak Rohim terpaksa berutang untuk operasi anaknya dan kini tak mampu melunasi.',a:'gharimin'},
+   {d:'Guru ngaji dan dai yang berdakwah di dusun terpencil Pulau Bawean tanpa gaji tetap.',a:'fisabilillah'},
+   {d:'Peziarah Malam Selawe dari luar kota yang dompetnya hilang dan tidak punya ongkos pulang.',a:'ibnusabil'}]})}
+];
+
+/* ---- mesin hitung deterministik (AI tidak menghitung; kode yang memverifikasi) ---- */
+const ENGINE={
+ fitrah(c){const w=c.anggota.filter(a=>FITRAH_TYPES[a.t]?.wajib).length;return{fields:[['kg','Total beras','kg',w*ACUAN.fitrahKg],['rp','Atau total uang','Rp',w*c.nilai]],steps:[...c.anggota.map(a=>`${a.n}: ${FITRAH_TYPES[a.t].wajib?'<b>wajib</b>':'tidak dihitung'} — ${FITRAH_TYPES[a.t].why}`),`Jumlah jiwa wajib = ${w}. Beras: ${w} × 2,5 kg = <b>${kg(w*2.5)}</b> (atau ${w} × 3,5 l = ${(w*3.5).toLocaleString('id-ID')} liter).`,`Uang: ${w} × ${rp(c.nilai)} = <b>${rp(w*c.nilai)}</b>.`]}},
+ usaha(c){const b=c.kas+c.persediaan+c.piutang-c.utang,n=85*c.hargaEmas,z=b>=n?b*ACUAN.kadar:0;return{fields:[['z','Zakat usaha yang wajib dikeluarkan (isi 0 bila belum wajib)','Rp',z]],steps:[`Aset tetap (kolam, kincir, pompa) ${rp(c.asetTetap)} <b>tidak</b> dihitung, karena bukan barang dagangan.`,`Dasar zakat = kas ${rp(c.kas)} + bandeng siap jual ${rp(c.persediaan)} + piutang lancar ${rp(c.piutang)} − utang jatuh tempo ${rp(c.utang)} = <b>${rp(b)}</b>.`,`Nisab = 85 g × ${rp(c.hargaEmas)} = ${rp(n)} → ${b>=n?'<b>mencapai nisab</b>':'<b>belum mencapai nisab</b>'} (haul sudah genap).`,b>=n?`Zakat = 2,5% × ${rp(b)} = <b>${rp(z)}</b>.`:'Zakat belum wajib; dianjurkan bersedekah/infak.']}},
+ tani(c){const r=c.air==='hujan'?0.1:0.05,z=c.panen>=ACUAN.nisabGabah?c.panen*r:0;return{fields:[['z','Zakat gabah (isi 0 bila belum wajib)','kg',z]],steps:[`Hasil panen ${kg(c.panen)} gabah dibandingkan nisab 653 kg → ${c.panen>=653?'<b>mencapai nisab</b>':'<b>belum mencapai nisab</b>'}.`,`Pengairan ${c.air==='hujan'?'tadah hujan/sungai tanpa biaya → kadar <b>10%</b>':'pompa/irigasi berbiaya → kadar <b>5%</b>'}.`,c.panen>=653?`Zakat = ${r*100}% × ${kg(c.panen)} = <b>${kg(z)}</b>, dikeluarkan saat panen tanpa menunggu haul.`:'Zakat belum wajib.']}},
+ gaji(c){const b=c.gaji+c.tunjangan,z=b>=ACUAN.nisabGaji?b*ACUAN.kadar:0;return{fields:[['z','Zakat penghasilan per bulan (isi 0 bila belum wajib)','Rp',z]],steps:[`Penghasilan bruto = gaji ${rp(c.gaji)} + tunjangan ${rp(c.tunjangan)} = <b>${rp(b)}</b>.`,`Cicilan ${rp(c.cicilan)} <b>tidak</b> mengurangi, karena ketentuan BAZNAS memakai penghasilan bruto.`,`Nisab bulanan 2026 = ${rp(ACUAN.nisabGaji)} → ${b>=ACUAN.nisabGaji?'<b>wajib zakat</b>':'<b>belum wajib</b>'}.`,b>=ACUAN.nisabGaji?`Zakat = 2,5% × ${rp(b)} = <b>${rp(z)}</b> per bulan.`:'Belum wajib zakat; dianjurkan infak.']}},
+ emas(c){const ok=c.simpan>=85&&c.haul,g=ok?c.simpan*ACUAN.kadar:0;return{fields:[['g','Zakat emas','gram',g],['rp','Setara uang','Rp',g*c.hargaEmas]],steps:[`Perhiasan ${gr(c.pakai)} yang dipakai wajar <b>tidak</b> dihitung (pendapat jumhur; mazhab Hanafi berpendapat tetap wajib).`,`Emas simpanan ${gr(c.simpan)} dibandingkan nisab 85 g → ${c.simpan>=85?'mencapai nisab':'belum mencapai nisab'}; haul ${c.haul?'sudah':'belum'} genap.`,ok?`Zakat = 2,5% × ${gr(c.simpan)} = <b>${gr(g)}</b> ≈ ${gr(g)} × ${rp(c.hargaEmas)} = <b>${rp(g*c.hargaEmas)}</b>.`:'Zakat belum wajib.']}}
+};
+
+/* ---- generator kasus offline (cadangan bila GenAI tak tersedia) ---- */
+const NAMA_L=['Pak Slamet','Cak Mat','Pak Huda','Mas Fajar','Pak Ridwan','Abah Karim','Cak Rohmad'],NAMA_P=['Bu Lilik','Mbak Rini','Bu Khotim','Ning Aisyah','Bu Romlah','Mbak Ulfa'];
+const DESA=['Manyar','Bungah','Sidayu','Duduksampeyan','Cerme','Benjeng','Dukun','Ujungpangkah','Panceng','Kebomas'];
+const OFFLINE={
+ fitrah(){const L=pick(NAMA_L),a=[{n:`${L} (kepala keluarga)`,t:'dewasa'},{n:'Istri',t:'dewasa'}];for(let i=0;i<rnd(1,4);i++)a.push({n:`Anak ke-${i+1}, ${rnd(2,15)} tahun`,t:'anak'});const ex=pick(['bayi_sebelum','bayi_sesudah','wafat_sebelum','ditanggung_lain']);a.push({n:{bayi_sebelum:'Bayi yang lahir 30 Ramadan pukul 15.30',bayi_sesudah:'Bayi yang lahir malam takbiran pukul 20.00',wafat_sebelum:'Kakek yang wafat 28 Ramadan',ditanggung_lain:'Adik ipar yang menumpang, fitrahnya dibayar orang tuanya'}[ex],t:ex});return{nama:L,cerita:`“Saya dari ${pick(DESA)}, mau bayar fitrah sekeluarga di Pasar Bandeng ini. Monggo dibantu hitung.”`,nilai:pick([45000,50000,55000]),anggota:a}},
+ usaha(){return{nama:pick(NAMA_L),cerita:`“Tambak bandeng saya di ${pick(['Manyar','Bungah','Ujungpangkah','Sidayu'])} sudah berjalan setahun penuh. Monggo dihitung zakatnya.”`,kas:rnd(10,80,5)*1e6,persediaan:rnd(40,220,5)*1e6,piutang:rnd(0,40,5)*1e6,utang:rnd(5,60,5)*1e6,asetTetap:rnd(100,500,25)*1e6,hargaEmas:rnd(1800000,2400000,50000)}},
+ tani(){return{nama:pick(NAMA_L),cerita:`“Sawah saya di ${pick(['Balongpanggang','Benjeng','Duduksampeyan','Cerme'])} baru panen.”`,panen:rnd(400,4000,50),air:pick(['hujan','irigasi'])}},
+ gaji(){return{nama:pick(NAMA_P),cerita:`“Saya bekerja di ${pick(['pabrik pupuk','galangan kapal','kantor kecamatan','pabrik semen','sekolah swasta'])} Gresik.”`,gaji:rnd(4500000,12000000,100000),tunjangan:rnd(0,2500000,100000),cicilan:rnd(0,2500000,100000)}},
+ emas(){return{nama:pick(NAMA_P),cerita:'“Tabungan emas saya dari hasil menenun sarung.”',simpan:rnd(40,200,5),pakai:rnd(5,40,5),haul:Math.random()>.2,hargaEmas:rnd(1800000,2400000,50000)}}
+};
+
+/* ================= STATE ================= */
+const S={done:{},cases:{},cur:null,mode:'vr',ai:{mode:'offline',sample:null,tts:null},chat:[],snd:false};
+try{Object.assign(S.done,JSON.parse(localStorage.getItem('sambang-done')||'{}'))}catch(e){}
+const save=()=>{try{localStorage.setItem('sambang-done',JSON.stringify(S.done))}catch(e){}};
+ST.forEach(s=>S.cases[s.id]=s.base());
+
+/* ================= GENERATIVE AI LAYER ================= */
+const SYS=`Kamu adalah "Mbah Yai", kiai kampung yang ramah dari Gresik, pembimbing mata kuliah Filantropi Islam di Universitas Sunan Gresik. Gaya: hangat, sesekali menyapa "Le" atau "Nduk", memakai istilah lokal secukupnya (Pasar Bandeng, Malam Selawe, Sunan Giri, Sunan Gresik/Maulana Malik Ibrahim). Pedagogi: Sokratik — pancing dengan pertanyaan, beri petunjuk bertahap, jangan langsung memberi angka jawaban kecuali diminta setelah mahasiswa mencoba. Acuan fikih yang WAJIB dipakai: zakat fitrah 2,5 kg/3,5 liter beras per jiwa atau Rp50.000 (SK Ketua BAZNAS No.14/2026); nisab penghasilan 2026 Rp7.640.144/bulan atau Rp91.681.728/tahun, 2,5% dari bruto (SK Ketua BAZNAS No.15/2026, Fatwa MUI No.3/2003); nisab emas 85 g, haul 1 tahun, 2,5%; zakat pertanian nisab 653 kg gabah, 10% tadah hujan, 5% irigasi berbiaya, tanpa haul; zakat perniagaan/tambak = (aset lancar + piutang lancar − utang jatuh tempo) × 2,5%, aset tetap tidak dihitung; 8 asnaf QS at-Taubah:60. Bila ada perbedaan pendapat ulama, sebutkan secara adil. Jangan mengarang hadis atau nomor hadis; bila ragu katakan perlu dicek. Jawab dalam bahasa Indonesia, ringkas (maks. 120 kata) kecuali diminta panjang.`;
+
+async function aiAsk(prompt,{onText,sys=SYS,history=null}={}){
+ const msgs=history?[...history]:[{role:'user',content:prompt}];
+ msgs[0]={role:'user',content:sys+'\n\n---\n'+msgs[0].content};
+ if(S.ai.mode==='claude'){
+  const r=await S.ai.sample(msgs,{cache:false,modelTier:'quick',onText:onText?(({text})=>onText(text)):undefined});
+  return r.text;
+ }
+ if(S.ai.mode==='puter'){
+  const r=await window.puter.ai.chat(msgs);
+  const t=typeof r==='string'?r:(r?.message?.content?.[0]?.text??r?.message?.content??r?.text??String(r));
+  onText&&onText(t);return t;
+ }
+ throw new Error('offline');
+}
+function setAI(mode,label){S.ai.mode=mode;const p=$('aiPill');p.className='pill '+mode;$('aiTxt').textContent=label}
+async function initAI(){
+ if(window.claude&&typeof window.claude.use==='function'){
+  try{const s=await window.claude.use('sample');if(s){S.ai.sample=s;setAI('claude','AI: Claude aktif')}else setAI('offline','AI: mode luring')}catch(e){setAI('offline','AI: mode luring')}
+  try{S.ai.tts=await window.claude.use('tts')}catch(e){}
+  return;
+ }
+ const sc=document.createElement('script');sc.src='https://js.puter.com/v2/';
+ sc.onload=()=>{if(window.puter&&window.puter.ai)setAI('puter','AI: Puter GenAI aktif');else setAI('offline','AI: mode luring')};
+ sc.onerror=()=>setAI('offline','AI: mode luring');
+ document.head.appendChild(sc);
+ setTimeout(()=>{if(S.ai.mode==='offline'&&$('aiTxt').textContent.includes('menghubungkan'))setAI('offline','AI: mode luring')},9000);
+}
+function parseJSON(t){const m=String(t).match(/\{[\s\S]*\}/);if(!m)throw new Error('no json');return JSON.parse(m[0])}
+
+/* ---- suara: narasi & gamelan slendro ---- */
+function speak(text){
+ const plain=String(text).replace(/<[^>]+>/g,'').replace(/[“”]/g,'');
+ if(S.ai.tts){S.ai.tts.speak(plain.slice(0,1900),{voice:'rounded'}).catch(()=>webSpeak(plain));return}
+ webSpeak(plain);
+}
+function webSpeak(t){try{const u=new SpeechSynthesisUtterance(t);u.lang='id-ID';u.rate=0.98;const v=speechSynthesis.getVoices().find(v=>/^id/i.test(v.lang));if(v)u.voice=v;speechSynthesis.cancel();speechSynthesis.speak(u)}catch(e){toast('Narasi suara tidak tersedia di peramban ini.')}}
+let AC=null,gTimer=null;
+function note(f,t0,dur=1.8,vol=.06){const o=AC.createOscillator(),o2=AC.createOscillator(),g=AC.createGain();o.type='sine';o2.type='triangle';o.frequency.value=f;o2.frequency.value=f*2.01;g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(vol,t0+.01);g.gain.exponentialRampToValueAtTime(.0001,t0+dur);o.connect(g);o2.connect(g);g.connect(AC.destination);o.start(t0);o2.start(t0);o.stop(t0+dur);o2.stop(t0+dur)}
+const SLENDRO=[1,1.1487,1.3195,1.5157,1.7411,2];
+function gamelanLoop(){if(!S.snd)return;const t=AC.currentTime,b=220;note(b*pick(SLENDRO),t,2.2,.045);if(Math.random()>.55)note(b/2*pick(SLENDRO),t+.35,2.6,.035);gTimer=setTimeout(gamelanLoop,900+Math.random()*1400)}
+function chime(ok){if(!AC)return;const t=AC.currentTime;(ok?[1,1.3195,1.7411,2]:[1.5157,1.1487]).forEach((r,i)=>note(330*r,t+i*.12,1.2,.07))}
+$('sndBtn').onclick=()=>{try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();AC.resume()}catch(e){return}S.snd=!S.snd;$('sndBtn').style.background=S.snd?'#f2b63240':'';clearTimeout(gTimer);if(S.snd)gamelanLoop()};
+
+/* ================= UI HELPERS ================= */
+function toast(m,ms=2600){const t=$('toast');t.innerHTML=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),ms)}
+function avatarSVG(col,fem){return `<svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="15" r="8" fill="#e0b18c"/>${fem?`<path d="M10 17a10 10 0 0 1 20 0v6H10Z" fill="${col}"/>`:`<rect x="12" y="4" width="16" height="7" rx="1.5" fill="#151515"/>`}<path d="M6 40a14 14 0 0 1 28 0Z" fill="${col}"/></svg>`}
+function renderKendi(){$('kendi').innerHTML=ST.map(s=>`<span class="coin ${S.done[s.id]?'on':''}" title="${s.t}"></span>`).join('')}
+function renderDock(){$('dock').innerHTML=ST.map(s=>`<button data-s="${s.id}" class="${S.done[s.id]?'done':''}" aria-label="Misi ${s.no}: ${s.t}"><span class="n">${S.done[s.id]?'✓':s.no}</span><span class="lbl">${s.t}</span></button>`).join('')+`<button class="main" data-x="yai">Mbah Yai AI</button><button data-x="ar">AR</button><button data-x="refleksi">Refleksi</button>`}
+$('dock').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.s){goStation(b.dataset.s)}else if(b.dataset.x==='yai')openChat();else if(b.dataset.x==='ar')enterAR();else if(b.dataset.x==='refleksi')openRefleksi()});
+function openPanel(title,sub,av){$('pTitle').textContent=title;$('pSub').textContent=sub;$('pAv').innerHTML=av;$('panel').classList.add('open');document.body.classList.add('panel-open');$('chatbar').hidden=true}
+function closePanel(){$('panel').classList.remove('open');document.body.classList.remove('panel-open');S.cur=null}
+$('pClose').onclick=closePanel;
+function complete(id){if(!S.done[id]){S.done[id]=true;save();renderKendi();renderDock();markStall(id);chime(true);const n=Object.keys(S.done).length;toast(n===6?'Masya Allah! Keenam koin terkumpul. Lanjutkan ke <b>Refleksi</b>.':`Koin amal ke-${n} masuk kendi.`)}}
+
+/* ================= PANEL MISI ================= */
+function dalilHTML(key,open){const d=DALIL[key];return `<details class="dalil" ${open?'open':''}><summary>Dalil & ketentuan</summary><div class="ar" lang="ar">${d.ar}</div><div class="tr">${d.tr}</div><div class="src">${d.src}</div></details>`}
+function dataRows(id,c){
+ if(id==='fitrah')return `<table class="data">${c.anggota.map((a,i)=>`<tr><td>${i+1}. ${esc(a.n)}</td><td></td></tr>`).join('')}<tr><td>Nilai uang per jiwa (ketetapan amil setempat)</td><td>${rp(c.nilai)}</td></tr></table>`;
+ if(id==='usaha')return `<table class="data"><tr><td>Kas & tabungan usaha</td><td>${rp(c.kas)}</td></tr><tr><td>Bandeng siap jual (persediaan)</td><td>${rp(c.persediaan)}</td></tr><tr><td>Piutang lancar ke pengepul</td><td>${rp(c.piutang)}</td></tr><tr><td>Utang pakan jatuh tempo</td><td>${rp(c.utang)}</td></tr><tr><td>Kolam, kincir & pompa (aset tetap)</td><td>${rp(c.asetTetap)}</td></tr><tr><td>Harga emas per gram (asumsi)</td><td>${rp(c.hargaEmas)}</td></tr></table>`;
+ if(id==='tani')return `<table class="data"><tr><td>Hasil panen gabah kering</td><td>${kg(c.panen)}</td></tr><tr><td>Sistem pengairan</td><td>${c.air==='hujan'?'tadah hujan / sungai':'pompa / irigasi berbayar'}</td></tr></table>`;
+ if(id==='gaji')return `<table class="data"><tr><td>Gaji pokok per bulan</td><td>${rp(c.gaji)}</td></tr><tr><td>Tunjangan tetap</td><td>${rp(c.tunjangan)}</td></tr><tr><td>Cicilan motor</td><td>${rp(c.cicilan)}</td></tr></table>`;
+ if(id==='emas')return `<table class="data"><tr><td>Emas batangan disimpan</td><td>${gr(c.simpan)}</td></tr><tr><td>Lama disimpan</td><td>${c.haul?'lebih dari 1 tahun hijriah':'baru 7 bulan'}</td></tr><tr><td>Kalung yang dipakai sehari-hari</td><td>${gr(c.pakai)}</td></tr><tr><td>Harga emas per gram (asumsi)</td><td>${rp(c.hargaEmas)}</td></tr></table>`;
+ return '';
+}
+function goStation(id){
+ const s=ST.find(x=>x.id===id);S.cur=id;teleport(id);
+ const c=S.cases[id];const fem=/Bu |Mbak|Ustazah|Ning/.test(c.nama||s.npc);
+ openPanel(`${s.no}. ${s.t}`,`${c.nama||s.npc} · ${s.role}`,avatarSVG(s.col,fem));
+ if(id==='asnaf'){renderAsnaf(s,c);return}
+ const E=ENGINE[id](c);
+ $('pBody').innerHTML=`<p class="story">${esc(c.cerita)}</p>${dataRows(id,c)}${dalilHTML(id==='usaha'?'usaha':id,false)}
+ <div class="q">${E.fields.map(f=>`<label>${f[1]}<span class="row"><input inputmode="decimal" id="f_${f[0]}" placeholder="jawaban Anda" autocomplete="off"><span class="unit">${f[2]}</span></span></label>`).join('')}</div>
+ <div class="acts"><button class="btn pri" id="bCek">Periksa jawaban</button><button class="btn" id="bHint">Minta petunjuk</button><button class="btn brick" id="bNew">Kasus baru (GenAI)</button><button class="btn" id="bSay" aria-label="Dengarkan kisah">🔊 Dengar</button></div>
+ <div id="out"></div><p class="note">Angka diverifikasi oleh mesin hitung deterministik; AI hanya membuat kasus & membimbing.</p>`;
+ $('bCek').onclick=()=>check(id);$('bHint').onclick=()=>hint(id);$('bNew').onclick=()=>newCase(id);$('bSay').onclick=()=>speak(`${c.nama} berkata: ${c.cerita}`);
+}
+const num=v=>{v=String(v).trim().replace(/rp/i,'').replace(/\s/g,'');if(/,\d{1,2}$/.test(v))v=v.replace(/\./g,'').replace(',','.');else v=v.replace(/[.,](?=\d{3}(\D|$))/g,'');return parseFloat(v)};
+function check(id){
+ const E=ENGINE[id](S.cases[id]);let allOk=true,ans=[];
+ E.fields.forEach(f=>{const v=num($('f_'+f[0]).value);const tol=f[2]==='Rp'?Math.max(500,f[3]*.002):0.011;const ok=!isNaN(v)&&Math.abs(v-f[3])<=tol;ans.push(`${f[1]}: ${isNaN(v)?'(kosong)':v}`);if(!ok)allOk=false;$('f_'+f[0]).style.borderColor=ok?'#5fd08a':'#ff7a66'});
+ const steps=`<ol>${E.steps.map(x=>`<li>${x}</li>`).join('')}</ol>`;
+ if(allOk){$('out').innerHTML=`<div class="fb ok"><b>Tepat, barakallah!</b> Begini alur analisisnya:${steps}</div>`;complete(id)}
+ else{chime(false);$('out').innerHTML=`<div class="fb bad"><b>Belum tepat.</b> Coba telaah lagi: harta mana yang masuk hitungan, apakah nisab & haul terpenuhi, berapa kadarnya?<div class="acts"><button class="btn" id="bWhy">Mbah Yai, di mana salah saya?</button><button class="btn" id="bShow">Tampilkan pembahasan</button></div></div><div id="why"></div>`;
+  $('bShow').onclick=()=>{$('why').innerHTML=`<div class="fb ok">${steps}</div>`};
+  $('bWhy').onclick=()=>diagnose(id,ans,E)}
+}
+function aiBox(target,title){$(target).innerHTML=`<div class="ai"><div class="who">${title} <span class="tag">${S.ai.mode==='offline'?'luring':'GenAI'}</span></div><span class="t">Mbah Yai sedang menimbang…</span></div>`;return $(target).querySelector('.t')}
+async function hint(id){
+ $('out').innerHTML='<div id="hintBox"></div>';const t=aiBox('hintBox','Petunjuk Mbah Yai');
+ const c=S.cases[id];
+ try{const r=await aiAsk(`Mahasiswa sedang mengerjakan kasus ${ST.find(s=>s.id===id).t}. Data kasus (JSON): ${JSON.stringify(c)}. Beri SATU petunjuk Sokratik bertahap (2–3 kalimat) yang mengarahkan cara berpikir, tanpa menyebut angka jawaban akhir.`,{onText:x=>t.innerHTML=md(x)});t.innerHTML=md(r)}
+ catch(e){t.innerHTML=md(OFFHINT[id])}
+}
+const OFFHINT={fitrah:'Nduk, coba pilah dulu: siapa yang **hidup dan muslim saat matahari terbenam di hari terakhir Ramadan**? Lalu siapa yang zakatnya sudah ditanggung orang lain? Baru kalikan jumlah jiwa dengan takaran per jiwa.',usaha:'Le, bedakan **aset lancar** (yang diperjualbelikan) dan **aset tetap** (alat produksi). Kurangi utang yang jatuh tempo, lalu bandingkan dengan nisab 85 gram emas.',tani:'Perhatikan dua hal: apakah panen **sudah mencapai 653 kg**? Dan bagaimana sawahnya diairi — dengan biaya atau tidak? Itu menentukan 10% atau 5%.',gaji:'Menurut BAZNAS, yang dihitung penghasilan **bruto**. Apakah cicilan termasuk pengurang? Bandingkan totalnya dengan nisab bulanan 2026.',emas:'Pisahkan **emas simpanan** dari **perhiasan yang dipakai wajar**. Lalu cek dua syarat: nisab 85 g dan haul setahun.'};
+async function diagnose(id,ans,E){
+ const t=aiBox('why','Diagnosis Mbah Yai');
+ try{const r=await aiAsk(`Kasus: ${ST.find(s=>s.id===id).t}. Data: ${JSON.stringify(S.cases[id])}. Jawaban mahasiswa: ${ans.join('; ')}. Kunci jawaban yang benar (dari mesin hitung): ${E.fields.map(f=>f[1]+' = '+f[3]).join('; ')}. Langkah benar: ${E.steps.join(' | ').replace(/<[^>]+>/g,'')}. Tebak miskonsepsi paling mungkin dari jawaban mahasiswa (mis. memasukkan aset tetap, salah kadar, lupa nisab, menghitung bayi yang tidak wajib), jelaskan dengan lembut, lalu ajukan satu pertanyaan reflektif. Jangan tulis ulang semua langkah.`,{onText:x=>t.innerHTML=md(x)});t.innerHTML=md(r)}
+ catch(e){t.innerHTML=md('Mode luring: bandingkan jawabanmu dengan pembahasan langkah demi langkah. Periksa terutama **harta yang tidak dihitung**, **syarat nisab/haul**, dan **kadar**.')}
+}
+async function newCase(id){
+ const b=$('bNew');b.disabled=true;b.textContent='Menyusun kasus…';
+ let c=null;
+ if(S.ai.mode!=='offline'){
+  const schema={fitrah:'{"nama":str,"cerita":str,"nilai":angka rupiah per jiwa 40000-60000,"anggota":[{"n":deskripsi orang,"t":salah satu dari "dewasa","anak","bayi_sebelum","bayi_sesudah","wafat_sebelum","ditanggung_lain"}] (4-9 orang, minimal satu kasus pengecoh)}',usaha:'{"nama","cerita","kas","persediaan","piutang","utang","asetTetap","hargaEmas"} semua angka rupiah bulat; hargaEmas 1800000-2500000',tani:'{"nama","cerita","panen":kg gabah 300-5000,"air":"hujan" atau "irigasi"}',gaji:'{"nama","cerita","gaji","tunjangan","cicilan"} angka rupiah; buat kadang di bawah nisab',emas:'{"nama","cerita","simpan":gram,"pakai":gram,"haul":true/false,"hargaEmas":angka}'}[id];
+  try{const r=await aiAsk(`Buat SATU kasus baru untuk latihan "${ST.find(s=>s.id===id).t}" berlatar masyarakat Gresik (desa nyata Kabupaten Gresik, profesi lokal: penambak bandeng, nelayan, petani, pengrajin songkok, penenun sarung, buruh industri, pedagang Pasar Bandeng, santri, dsb). Cerita 1–2 kalimat sebagai ucapan tokoh dalam tanda kutip. Balas HANYA JSON valid tanpa teks lain dengan skema: ${schema}`,{sys:'Kamu perancang soal studi kasus fikih zakat yang akurat dan kontekstual. Jangan menghitung jawaban.'});
+   c=sanitize(id,parseJSON(r))}catch(e){c=null}
+ }
+ if(!c){c=OFFLINE[id]();toast(S.ai.mode==='offline'?'Kasus dibuat generator luring (GenAI tidak tersedia di tampilan ini).':'GenAI gagal merespons; memakai generator luring.')}
+ else toast('Kasus baru disusun oleh GenAI ✓');
+ S.cases[id]=c;goStation(id);
+}
+function sanitize(id,o){
+ const N=(v,a,b)=>{v=Number(v);if(!isFinite(v))throw 0;return Math.min(b,Math.max(a,Math.round(v)))};
+ const base={nama:String(o.nama||'Warga').slice(0,40),cerita:String(o.cerita||'').slice(0,300)};
+ if(id==='fitrah'){const an=(o.anggota||[]).filter(a=>FITRAH_TYPES[a.t]).slice(0,10).map(a=>({n:String(a.n).slice(0,90),t:a.t}));if(an.length<2)throw 0;return{...base,nilai:N(o.nilai,30000,80000),anggota:an}}
+ if(id==='usaha')return{...base,kas:N(o.kas,0,5e9),persediaan:N(o.persediaan,0,5e9),piutang:N(o.piutang,0,5e9),utang:N(o.utang,0,5e9),asetTetap:N(o.asetTetap,0,5e10),hargaEmas:N(o.hargaEmas,800000,5000000)};
+ if(id==='tani')return{...base,panen:N(o.panen,50,50000),air:o.air==='hujan'?'hujan':'irigasi'};
+ if(id==='gaji')return{...base,gaji:N(o.gaji,0,2e8),tunjangan:N(o.tunjangan,0,1e8),cicilan:N(o.cicilan,0,1e8)};
+ if(id==='emas')return{...base,simpan:N(o.simpan,1,5000),pakai:N(o.pakai,0,1000),haul:!!o.haul,hargaEmas:N(o.hargaEmas,800000,5000000)};
+}
+
+/* ---- misi asnaf ---- */
+function renderAsnaf(s,c){
+ $('pBody').innerHTML=`<p class="story">${esc(c.cerita)}</p>${dalilHTML('asnaf',true)}
+ <div class="cards">${c.kartu.map((k,i)=>`<div class="mcard" id="mc${i}"><p>${esc(k.d)}</p><select id="sa${i}" aria-label="Asnaf untuk kartu ${i+1}"><option value="">— pilih asnaf —</option>${ASNAF.map(a=>`<option value="${a.k}">${a.n}</option>`).join('')}</select></div>`).join('')}</div>
+ <div class="acts"><button class="btn pri" id="bCekA">Periksa klasifikasi</button><button class="btn brick" id="bNewA">Kartu baru (GenAI)</button><button class="btn" id="bSayA">🔊 Dengar</button></div><div id="out"></div>
+ <p class="note">Tip: buka mode AR → “Roda 8 Asnaf” untuk melihat definisi tiap asnaf secara 3D.</p>`;
+ $('bCekA').onclick=()=>{let ok=0;c.kartu.forEach((k,i)=>{const v=$('sa'+i).value,g=v===k.a;if(g)ok++;$('mc'+i).className='mcard '+(g?'ok':'bad')});
+  const wrong=c.kartu.map((k,i)=>({k,v:$('sa'+i).value})).filter(x=>x.v!==x.k.a);
+  $('out').innerHTML=ok===c.kartu.length?`<div class="fb ok"><b>Sempurna, ${ok}/${c.kartu.length}.</b> Penyaluran Anda tepat sasaran.</div>`:`<div class="fb bad"><b>${ok}/${c.kartu.length} tepat.</b> Kartu bertanda merah perlu ditelaah ulang. Perhatikan kata kunci: penghasilan nihil vs kurang, utang, perjalanan, status keislaman.<div class="acts"><button class="btn" id="bWhyA">Mbah Yai, jelaskan kartu yang salah</button></div></div><div id="why"></div>`;
+  if(ok===c.kartu.length)complete('asnaf');else{chime(false);$('bWhyA').onclick=async()=>{const t=aiBox('why','Penjelasan Mbah Yai');try{const r=await aiAsk(`Mahasiswa salah mengklasifikasikan mustahik berikut: ${wrong.map(x=>`"${x.k.d}" dijawab ${x.v||'kosong'}, kunci ${x.k.a}`).join('; ')}. Jelaskan singkat per kartu mengapa kuncinya tepat berdasarkan QS at-Taubah:60 dan sebutkan bila ada khilaf ulama.`,{onText:x=>t.innerHTML=md(x)});t.innerHTML=md(r)}catch(e){t.innerHTML=wrong.map(x=>{const a=ASNAF.find(a=>a.k===x.k.a);return `• <b>${a.n}</b>: ${a.d}`}).join('<br>')}}}};
+ $('bSayA').onclick=()=>speak(c.cerita+' '+c.kartu.map((k,i)=>`Kartu ${i+1}. ${k.d}`).join(' '));
+ $('bNewA').onclick=async()=>{const b=$('bNewA');b.disabled=true;b.textContent='Menyusun…';let nk=null;
+  if(S.ai.mode!=='offline'){try{const r=await aiAsk(`Buat 8 kartu calon penerima zakat baru berlatar Kabupaten Gresik (satu untuk tiap asnaf, urutan acak, jangan sebut nama asnafnya di deskripsi). Balas HANYA JSON: {"kartu":[{"d":"deskripsi 1 kalimat","a":"fakir|miskin|amil|mualaf|riqab|gharimin|fisabilillah|ibnusabil"}]}`,{sys:'Kamu perancang soal fikih zakat yang akurat. Hindari kasus yang diperselisihkan tajam.'});const o=parseJSON(r);nk=(o.kartu||[]).filter(k=>ASNAF.some(a=>a.k===k.a)).slice(0,8).map(k=>({d:String(k.d).slice(0,200),a:k.a}));if(nk.length<6)nk=null}catch(e){nk=null}}
+  if(!nk){nk=[...c.kartu].sort(()=>Math.random()-.5);toast('GenAI tidak tersedia: kartu diacak ulang.')}else toast('Kartu baru disusun GenAI ✓ — kunci dari AI, diskusikan bila ragu.');
+  S.cases.asnaf={...c,kartu:nk};goStation('asnaf')};
+}
+
+/* ---- chat Mbah Yai ---- */
+const FAQ=[[/nisab.*(gaji|penghasilan|profesi)|(gaji|penghasilan).*nisab/i,'Nisab zakat penghasilan 2026 menurut SK Ketua BAZNAS No. 15/2026 adalah **Rp7.640.144 per bulan** (Rp91.681.728 per tahun), kadarnya 2,5% dari bruto. Nah Nduk, kalau gajimu Rp7 juta plus tunjangan Rp1 juta, sudah wajib belum?'],[/fitrah/i,'Zakat fitrah itu **2,5 kg atau 3,5 liter beras per jiwa**; BAZNAS 2026 menetapkan Rp50.000 untuk wilayah Jabodetabek, daerah lain mengikuti harga beras setempat. Wajib bagi muslim yang hidup saat terbenam matahari akhir Ramadan. Coba tebak, bayi yang lahir saat takbiran wajib tidak?'],[/emas|perhiasan/i,'Emas simpanan wajib dizakati bila **≥ 85 g dan genap setahun**, kadarnya 2,5%. Perhiasan yang dipakai wajar tidak wajib menurut jumhur, tetapi wajib menurut mazhab Hanafi. Menurutmu mana yang lebih maslahat untuk Bu Siti?'],[/tambak|bandeng|dagang|usaha|perniaga/i,'Usaha tambak yang hasilnya dijual dihitung seperti **zakat perniagaan**: (aset lancar + piutang lancar − utang jatuh tempo) × 2,5%. Kolam dan pompa tidak dihitung. Ada juga ulama yang mengqiyaskan ke zakat pertanian, jadi diskusikan ya, Le.'],[/tani|padi|gabah|panen/i,'Zakat pertanian: nisab **653 kg gabah**; kadarnya 10% kalau tadah hujan, 5% kalau irigasinya berbiaya. Dikeluarkan setiap panen, tanpa haul.'],[/asnaf|mustahik|penerima/i,'Delapan asnaf ada di QS at-Taubah: 60: fakir, miskin, amil, mualaf, riqab, gharimin, fi sabilillah, ibnu sabil. Apa bedanya fakir dan miskin menurutmu?'],[/sunan|wali|giri|gresik|malik/i,'Sunan Gresik, Maulana Malik Ibrahim, dikenal mendekati rakyat kecil lewat perdagangan, pengobatan, dan bertani. Sunan Giri melanjutkan dakwah lewat pesantren, dan dari santrinya lahir tradisi Pasar Bandeng. Filantropinya memberdayakan, tidak sekadar memberi. Bagaimana zakat produktif bisa meneruskan semangat itu?']];
+function openChat(){
+ S.cur='chat';openPanel('Mbah Yai AI','Tutor Sokratik berlogat Gresik',`<svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="15" r="8" fill="#e0b18c"/><rect x="11" y="3" width="18" height="7" rx="2" fill="#f4efe6"/><path d="M14 20q6 9 12 0" fill="#f4efe6"/><path d="M6 40a14 14 0 0 1 28 0Z" fill="#2f6b4f"/></svg>`);
+ $('chatbar').hidden=false;
+ if(!S.chat.length)S.chat.push({role:'assistant',content:'Monggo, Le, Nduk. Selamat datang di Pasar Bandeng. Mau tanya soal zakat apa malam ini? Mbah ndak langsung kasih jawaban ya, kita pikir bareng-bareng.'});
+ renderChat();setTimeout(()=>$('chatIn').focus(),50);
+}
+function renderChat(){$('pBody').innerHTML=`<div class="chat"><div class="msgs">${S.chat.map(m=>`<div class="bubble ${m.role==='user'?'me':'yai'}">${md(m.content)}</div>`).join('')}</div><div class="chips">${['Apa beda fakir dan miskin?','Tambak bandeng kena zakat apa?','Bayi lahir malam takbiran wajib fitrah?','Teladan filantropi Sunan Gresik?'].map(q=>`<button>${q}</button>`).join('')}</div><button class="btn" id="chatSay">🔊 Dengar jawaban terakhir</button></div>`;
+ $('pBody').querySelectorAll('.chips button').forEach(b=>b.onclick=()=>sendChat(b.textContent));$('chatSay').onclick=()=>{const l=[...S.chat].reverse().find(m=>m.role==='assistant');l&&speak(l.content)};$('pBody').scrollTop=1e6}
+async function sendChat(q){
+ q=(q||$('chatIn').value).trim();if(!q)return;$('chatIn').value='';S.chat.push({role:'user',content:q});S.chat.push({role:'assistant',content:'…'});renderChat();
+ const bub=[...document.querySelectorAll('.bubble.yai')].pop();
+ let hist=S.chat.slice(0,-1).slice(-10);while(hist.length&&hist[0].role!=='user')hist.shift();
+ try{const r=await aiAsk(null,{history:hist,onText:x=>{bub.innerHTML=md(x);$('pBody').scrollTop=1e6}});S.chat[S.chat.length-1].content=r}
+ catch(e){const f=FAQ.find(f=>f[0].test(q));S.chat[S.chat.length-1].content=(f?f[1]:'Mbah sedang mode luring, Nduk. Coba tanyakan soal nisab, fitrah, emas, tambak, pertanian, asnaf, atau Sunan Gresik.')+(S.ai.mode==='offline'?'\n\n(mode luring)':'')}
+ renderChat();
+}
+$('chatSend').onclick=()=>sendChat();$('chatIn').addEventListener('keydown',e=>{if(e.key==='Enter')sendChat()});
+
+/* ---- refleksi ---- */
+function openRefleksi(){
+ S.cur='ref';openPanel('Refleksi Sambang','Sintesis nilai lokal & tata kelola zakat',avatarSVG('#b4532f',false));
+ const n=Object.keys(S.done).length;
+ $('pBody').innerHTML=`<p class="story">Tradisi Pasar Bandeng lahir dari santri Sunan Giri yang pulang membawa oleh-oleh, sedangkan Sunan Gresik dikenal memberdayakan warga lewat dagang dan tani. <b>Pertanyaan:</b> Rancanglah satu program zakat produktif untuk desa Anda di Gresik (mis. penambak, nelayan, atau pengrajin). Siapa asnafnya, dari zakat jenis apa dananya, dan nilai keteladanan wali mana yang Anda hidupkan?</p>
+ <p class="note">Misi selesai: ${n}/6</p><div class="q"><label>Jawaban refleksi (±100–200 kata)<textarea id="refIn" rows="7" style="width:100%;border-radius:10px;border:1px solid #ffffff2e;background:#0006;padding:10px;font-size:16px"></textarea></label></div>
+ <div class="acts"><button class="btn pri" id="bRef">Minta umpan balik Mbah Yai</button>${n===6?'<button class="btn brick" id="bCert">Lihat sertifikat</button>':''}</div><div id="refOut"></div>`;
+ try{$('refIn').value=localStorage.getItem('sambang-ref')||''}catch(e){}
+ $('refIn').oninput=e=>{try{localStorage.setItem('sambang-ref',e.target.value)}catch(_){}};
+ $('bRef').onclick=async()=>{const v=$('refIn').value.trim();if(v.length<40){toast('Tulis refleksi minimal beberapa kalimat dulu, Nduk.');return}const t=aiBox('refOut','Umpan balik Mbah Yai');
+  try{const r=await aiAsk(`Nilai refleksi mahasiswa berikut dengan rubrik 4 aspek (skor 1–4): (1) ketepatan fikih zakat & asnaf, (2) kedalaman analisis/sintesis program, (3) integrasi nilai kearifan lokal Gresik/Wali Songo secara bermakna, (4) kelayakan & dampak. Tulis skor tiap aspek, satu kekuatan, satu saran perbaikan, dan satu pertanyaan pemantik. Refleksi: """${v.slice(0,2500)}"""`,{onText:x=>t.innerHTML=md(x)});t.innerHTML=md(r)}
+  catch(e){const k=[['asnaf',/fakir|miskin|gharim|sabil|amil|mualaf|riqab/i],['jenis zakat',/fitrah|penghasilan|perniaga|tambak|pertanian|emas|mal/i],['kearifan lokal',/sunan|giri|gresik|bandeng|selawe|wali/i],['produktif/dampak',/modal|usaha|produktif|pelatihan|berdaya|mandiri/i]];t.innerHTML='Mode luring — cek kelengkapan:<br>'+k.map(([n,r])=>`${r.test(v)?'✓':'○'} ${n}`).join('<br>')}};
+ if(n===6)$('bCert').onclick=cert;
+}
+function cert(){const v=($('refIn')?.value||'').trim();$('pBody').innerHTML=`<div style="border:2px solid var(--kunyit);border-radius:16px;padding:20px;text-align:center;background:radial-gradient(circle at 50% 0,#f2b63222,transparent 70%)"><div style="font-family:Amiri,serif;font-size:26px;color:var(--kunyit)" lang="ar">جَزَاكُمُ اللّٰهُ خَيْرًا</div><h2 style="margin:6px 0">Sertifikat Sambang Dermawan</h2><p>Telah menuntaskan enam misi zakat di Pasar Bandeng Gresik: fitrah, usaha tambak, pertanian, penghasilan, emas, dan penyaluran 8 asnaf.</p><p class="note">Universitas Sunan Gresik · Prodi Pendidikan Agama Islam · Mata kuliah Filantropi Islam</p></div><div class="acts"><button class="btn" id="bCopy">Salin ringkasan untuk LMS</button></div>`;$('bCopy').onclick=async()=>{try{await navigator.clipboard.writeText(`Sambang Zakat — 6/6 misi selesai.\nRefleksi:\n${v}`);toast('Tersalin.')}catch(e){toast('Gagal menyalin; salin manual dari kotak refleksi.')}}}
+
+/* ================= DUNIA 3D (VR) ================= */
+let moved=false,pd=null;
+window.addEventListener('pointerdown',e=>{pd=[e.clientX,e.clientY];moved=false});
+window.addEventListener('pointermove',e=>{if(pd&&Math.hypot(e.clientX-pd[0],e.clientY-pd[1])>8)moved=true});
+const scene=$('scene');
+function el(tag,attrs,parent){const e=document.createElement(tag);for(const k in attrs)e.setAttribute(k,attrs[k]);(parent||$('vrWorld')).appendChild(e);return e}
+AFRAME.registerComponent('label',{schema:{value:{default:''},color:{default:'#ffffff'},size:{default:.1},bg:{default:'rgba(7,26,28,.72)'}},
+ init(){this.draw();if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>this.draw())},update(){this.draw()},
+ draw(){const d=this.data,lines=String(d.value).split('\n'),px=96,pad=px*.35,cv=document.createElement('canvas'),x=cv.getContext('2d');const font=`600 ${px}px Lexend, system-ui, sans-serif`;x.font=font;const w=Math.ceil(Math.max(...lines.map(l=>x.measureText(l).width))+pad*2),h=Math.ceil(lines.length*px*1.25+pad*1.2);cv.width=w;cv.height=h;x.font=font;if(d.bg&&d.bg!=='none'){x.fillStyle=d.bg;const r=px*.35;x.beginPath();x.roundRect?x.roundRect(0,0,w,h,r):x.rect(0,0,w,h);x.fill()}x.fillStyle=d.color;x.textAlign='center';x.textBaseline='middle';lines.forEach((l,i)=>x.fillText(l,w/2,pad*.6+px*1.25*(i+.5)));
+  const tex=new THREE.CanvasTexture(cv);tex.colorSpace=THREE.SRGBColorSpace;tex.anisotropy=4;const H=d.size*lines.length*1.25+d.size*.6,W=H*w/h;
+  const old=this.el.getObject3D('mesh');if(old){old.geometry.dispose();old.material.map&&old.material.map.dispose();old.material.dispose()}
+  this.el.setObject3D('mesh',new THREE.Mesh(new THREE.PlaneGeometry(W,H),new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false,fog:false})))},
+ remove(){this.el.removeObject3D('mesh')}});
+AFRAME.registerComponent('starfield',{init(){const g=new THREE.BufferGeometry(),p=[];for(let i=0;i<900;i++){const t=Math.random()*Math.PI*2,u=Math.random()*.9+.08,r=80;p.push(r*Math.cos(t)*Math.sqrt(1-u*u),r*u,r*Math.sin(t)*Math.sqrt(1-u*u))}g.setAttribute('position',new THREE.Float32BufferAttribute(p,3));this.el.setObject3D('mesh',new THREE.Points(g,new THREE.PointsMaterial({color:0xfff6dd,size:.35,fog:false})))}});
+$('stars').setAttribute('starfield','');
+const R=7.2,CZ=-3,ANG=[-78,-47,-16,16,47,78];
+const STALL={};
+function bandeng(p,s,parent){const g=el('a-entity',{position:p,scale:`${s} ${s} ${s}`},parent);el('a-sphere',{radius:.5,scale:'1 .32 .22',color:'#cfdadb',metalness:.6,roughness:.3},g);el('a-cone',{'radius-bottom':.2,'radius-top':0,height:.32,position:'-.6 0 0',rotation:'0 0 90',scale:'1 1 .25',color:'#9fb2b4'},g);el('a-sphere',{radius:.04,position:'.38 .05 .09',color:'#111'},g);return g}
+function person(parent,col,fem){const g=el('a-entity',{position:'0 0 -.75'},parent);el('a-cylinder',{radius:.22,height:.9,position:'0 .95 0',color:col},g);el('a-sphere',{radius:.17,position:'0 1.6 0',color:'#d8a982'},g);if(fem){el('a-sphere',{radius:.2,position:'0 1.63 -.02',scale:'1 1.05 1','theta-length':110,color:col},g);el('a-cone',{'radius-bottom':.26,'radius-top':.12,height:.35,position:'0 1.38 0',color:col},g)}else el('a-cylinder',{radius:.15,height:.13,position:'0 1.76 0',color:'#141414'},g);el('a-cylinder',{radius:.25,height:.5,position:'0 .25 0',color:'#2b2b2b'},g);return g}
+function goods(type,parent){
+ if(type==='bandeng'){for(let i=0;i<5;i++)bandeng(`${-.7+i*.35} 1.02 ${.25+(i%2)*.15}`,.55,parent);const k=el('a-cylinder',{radius:.35,height:.1,position:'.6 1 .2',color:'#3a2a1a'},parent)}
+ if(type==='pudak'){for(let i=0;i<8;i++)el('a-box',{width:.1,height:.3,depth:.05,position:`${-.7+i*.18} 1.12 .3`,rotation:'0 0 8',color:'#c8b27a'},parent);el('a-box',{width:.5,height:.05,depth:.3,position:'.55 1 .25',color:'#6a8a3a'},parent)}
+ if(type==='padi'){for(let i=0;i<3;i++){el('a-cylinder',{radius:.22,height:.5,position:`${-.6+i*.5} 1.2 .25`,color:'#e9dcc0'},parent);el('a-cone',{'radius-bottom':.12,'radius-top':.02,height:.12,position:`${-.6+i*.5} 1.5 .25`,color:'#d7c7a2'},parent)}for(let i=0;i<6;i++)el('a-cylinder',{radius:.012,height:.6,position:`${.75+Math.sin(i)*.08} 1.25 ${.2+Math.cos(i)*.08}`,rotation:`${i*4-10} 0 ${i*3-8}`,color:'#d9b64a'},parent)}
+ if(type==='kantor'){el('a-box',{width:.5,height:.32,depth:.12,position:'-.4 1.12 .25',color:'#3a3f55'},parent);el('a-plane',{width:.4,height:.5,position:'.3 1.02 .25',rotation:'-90 0 8',color:'#f4efe6'},parent);el('a-box',{width:.06,height:.06,depth:.06,position:'.62 1.03 .25',color:'#f2b632'},parent)}
+ if(type==='songkok'){for(let i=0;i<6;i++)el('a-cylinder',{radius:.11,height:.11,position:`${-.7+(i%3)*.26} ${1.02+Math.floor(i/3)*.11} .25`,color:'#121212'},parent);for(let i=0;i<4;i++)el('a-box',{width:.14,height:.05,depth:.07,position:`${.35+(i%2)*.16} ${1.0+Math.floor(i/2)*.05} .25`,color:'#e8b52f',metalness:.9,roughness:.2},parent);el('a-box',{width:.6,height:.04,depth:.4,position:'.45 .99 .25',color:'#7a1f2a'},parent)}
+ if(type==='lumbung'){ASNAF.forEach((a,i)=>{el('a-cylinder',{radius:.11,height:.26,position:`${-.84+i*.24} 1.1 .25`,color:a.c},parent)});const lb=el('a-entity',{position:'0 0 -1.1'},parent);el('a-box',{width:1.1,height:1,depth:.8,position:'0 .5 0',color:'#6e4a2c'},lb);el('a-cone',{'radius-bottom':.9,'radius-top':0,height:.7,'segments-radial':4,position:'0 1.35 0',rotation:'0 45 0',color:'#3b2a1e'},lb)}
+}
+function buildStall(s,i){
+ const a=ANG[i]*Math.PI/180,x=R*Math.sin(a),z=CZ-R*Math.cos(a);
+ const root=el('a-entity',{position:`${x} 0 ${z}`,rotation:`0 ${-ANG[i]} 0`,class:'clickable','data-s':s.id});
+ el('a-box',{width:2.2,height:.9,depth:.9,position:'0 .45 .25',color:'#5b3a24'},root);
+ el('a-box',{width:2.3,height:.06,depth:1,position:'0 .93 .25',color:'#7a5232'},root);
+ [[-1.05,.7],[1.05,.7],[-1.05,-1],[1.05,-1]].forEach(([px,pz])=>el('a-cylinder',{radius:.05,height:2.4,position:`${px} 1.2 ${pz}`,color:'#4a2f1d'},root));
+ el('a-cone',{'radius-bottom':1.85,'radius-top':.25,height:.9,'segments-radial':4,position:'0 2.8 -.15',rotation:'0 45 0',scale:'1 1 .75',color:s.col,roughness:.9},root);
+ el('a-box',{width:1.9,height:.36,depth:.04,position:'0 2.25 .72',color:'#1c1410'},root);
+ el('a-entity',{label:{value:`${s.no}. ${s.t}`,color:'#f4efe6',size:.17},position:'0 2.25 .75'},root);
+ const lamp=el('a-sphere',{radius:.12,position:'.95 2.05 .7',material:'color:#ffcf6b;emissive:#ffb22e;emissiveIntensity:1'},root);
+ el('a-sphere',{radius:.12,position:'-.95 2.05 .7',material:'color:#ff8a5b;emissive:#ff5a2e;emissiveIntensity:1'},root);
+ goods(s.goods,root);
+ const c=S.cases[s.id];person(root,s.col,/Bu |Mbak|Ustazah/.test(c.nama||s.npc));
+ const mk=el('a-octahedron',{radius:.18,position:'0 2.15 -.75',material:'color:#f2b632;emissive:#f2b632;emissiveIntensity:.7',animation:'property:rotation;to:0 360 0;loop:true;dur:4000;easing:linear',animation__b:'property:position;dir:alternate;to:0 2.3 -.75;loop:true;dur:1200;easing:easeInOutSine'},root);
+ root.addEventListener('mouseenter',()=>root.setAttribute('animation__h','property:scale;to:1.04 1.04 1.04;dur:200'));
+ root.addEventListener('mouseleave',()=>root.setAttribute('animation__h','property:scale;to:1 1 1;dur:200'));
+ root.addEventListener('click',()=>{if(S.mode==='vr'&&!moved)goStation(s.id)});
+ STALL[s.id]={root,mk,a:ANG[i]};
+ if(i===1||i===4)el('a-entity',{light:'type:point;color:#ffb35c;intensity:1.4;distance:9;decay:1.6',position:'0 2.2 1.2'},root);
+}
+function markStall(id){const m=STALL[id]?.mk;if(m)m.setAttribute('material','color:#5fd08a;emissive:#5fd08a;emissiveIntensity:.8')}
+function buildWorld(){
+ el('a-circle',{radius:60,rotation:'-90 0 0',color:'#1d1915',roughness:1,'hide-on-enter-ar':''});
+ el('a-circle',{radius:10.5,rotation:'-90 0 0',position:`0 .01 ${CZ}`,color:'#3a2a20',roughness:1});
+ for(let r=0;r<3;r++)el('a-ring',{'radius-inner':3+r*2.6,'radius-outer':3.12+r*2.6,rotation:'-90 0 0',position:`0 .02 ${CZ}`,color:'#7a4a2c'});
+ // gapura paduraksa bata merah
+ const gp=el('a-entity',{position:'0 0 -15'});
+ [-1,1].forEach(sd=>{for(let t=0;t<5;t++)el('a-box',{width:2.2-t*.32,height:1.1,depth:1.6-t*.18,position:`${sd*(1.9+ t*.0)} ${.55+t*1.1} 0`,color:t%2?'#a54a29':'#b4532f',roughness:.95},gp);el('a-box',{width:.5,height:.6,depth:.5,position:`${sd*1.9} 5.8 0`,color:'#8e3d22'},gp)});
+ el('a-box',{width:6.2,height:.25,depth:1.8,position:'0 .12 0',color:'#7a3a20'},gp);
+ el('a-entity',{label:{value:'PASAR BANDENG',color:'#f2b632',size:.55},position:'0 6.6 .2'},gp);
+ // masjid
+ const mj=el('a-entity',{position:'7 0 -26'});
+ el('a-box',{width:9,height:4,depth:6,position:'0 2 0',color:'#203a3a'},mj);
+ el('a-cone',{'radius-bottom':5.5,'radius-top':.4,height:2.6,'segments-radial':4,position:'0 5.3 0',rotation:'0 45 0',color:'#14302f'},mj);
+ el('a-cone',{'radius-bottom':3,'radius-top':.2,height:1.6,'segments-radial':4,position:'0 7.2 0',rotation:'0 45 0',color:'#14302f'},mj);
+ el('a-cylinder',{radius:.6,height:12,position:'-6 6 0',color:'#203a3a'},mj);el('a-sphere',{radius:.8,position:'-6 12.5 0',color:'#1d5a4a'},mj);
+ for(let i=0;i<5;i++)el('a-plane',{width:.8,height:1.4,position:`${-3.2+i*1.6} 2 3.02`,material:'color:#ffd27a;emissive:#ffb84a;emissiveIntensity:.9;shader:flat'},mj);
+ // bulan sabit
+ el('a-sphere',{radius:3,position:'-26 28 -60',material:'shader:flat;color:#fff4cf;fog:false','hide-on-enter-ar':''});
+ el('a-sphere',{radius:2.9,position:'-24.9 28.6 -58.5',material:'shader:flat;color:#0d2a30;fog:false','hide-on-enter-ar':''});
+ // tali lampion
+ for(let k=0;k<ANG.length-1;k++){const a1=ANG[k]*Math.PI/180,a2=ANG[k+1]*Math.PI/180;for(let j=1;j<6;j++){const f=j/6,aa=a1+(a2-a1)*f,rr=R+.9,y=2.6-Math.sin(f*Math.PI)*.4;el('a-sphere',{radius:.09,position:`${rr*Math.sin(aa)} ${y} ${CZ-rr*Math.cos(aa)}`,material:`shader:flat;color:${j%2?'#ffcf6b':'#ff7b54'}`})}}
+ // pusat alun: kendi amal & kolam bandeng
+ const kd=el('a-entity',{position:`0 0 ${CZ}`});
+ el('a-cylinder',{radius:1.6,height:.35,position:'0 .17 0',color:'#5b3a24'},kd);
+ el('a-cylinder',{radius:1.45,height:.05,position:'0 .34 0',material:'color:#2f6b74;metalness:.4;roughness:.15;opacity:.9;transparent:true'},kd);
+ for(let i=0;i<4;i++){const f=bandeng(`${Math.cos(i*1.6)*.8} .4 ${Math.sin(i*1.6)*.8}`,.5,kd);f.setAttribute('animation',`property:rotation;to:0 ${i%2?360:-360} 0;loop:true;dur:${9000+i*1500};easing:linear`)}
+ const big=bandeng('0 1.3 0',1.6,kd);big.setAttribute('animation','property:rotation;to:0 360 0;loop:true;dur:16000;easing:linear');
+ el('a-entity',{label:{value:'Bandeng Kawak\nJuara Kontes',color:'#d7e1e2',size:.2},position:'0 2.1 0'},kd);
+ el('a-entity',{light:'type:point;color:#ffc070;intensity:1.6;distance:14;decay:1.4',position:`0 3 ${CZ}`});
+ ST.forEach(buildStall);
+ Object.keys(S.done).forEach(markStall);
+}
+
+/* ---- navigasi ---- */
+function teleport(id){
+ const st=STALL[id];if(!st||S.mode!=='vr')return;const a=st.a*Math.PI/180,rv=R-4.9;
+ const rig=$('rig'),cam=$('cam');
+ rig.setAttribute('animation__tp',`property:position;to:${rv*Math.sin(a)} 0 ${CZ-rv*Math.cos(a)};dur:900;easing:easeInOutCubic`);
+ rig.setAttribute('rotation',`0 ${-st.a-(innerWidth>700?14:0)} 0`);cam.setAttribute('position','0 1.6 0');
+ const lc=cam.components['look-controls'];if(lc){lc.yawObject.rotation.y=0;lc.pitchObject.rotation.x=-.08}
+}
+function resetView(){const rig=$('rig');rig.removeAttribute('animation__tp');rig.setAttribute('position','0 0 8');rig.setAttribute('rotation','0 0 0');const lc=$('cam').components['look-controls'];if(lc){lc.yawObject.rotation.y=0;lc.pitchObject.rotation.x=0}}
+
+/* ================= MODE AR ================= */
+let arObj='fitrah',arJiwa=4,arGram=60,arRot=0,arScale=innerWidth<700?.75:1.35,stream=null;
+function arBuild(){
+ const w=$('arWorld');while(w.firstChild)w.removeChild(w.firstChild);
+ const P=w;el('a-cylinder',{radius:.75,height:.03,position:'0 -.02 0',material:'color:#0b2326;opacity:.55;transparent:true'},P);
+ el('a-ring',{'radius-inner':.72,'radius-outer':.76,rotation:'-90 0 0',position:'0 .0 0',material:'color:#f2b632;shader:flat'},P);
+ if(arObj==='fitrah'){
+  const cols=Math.ceil(Math.sqrt(arJiwa));for(let i=0;i<arJiwa;i++){const cx=(i%cols-(cols-1)/2)*.24,cz=(Math.floor(i/cols)-(Math.ceil(arJiwa/cols)-1)/2)*.24;const g=el('a-entity',{position:`${cx} 0 ${cz}`,scale:'0 0 0',animation:`property:scale;to:1 1 1;dur:400;delay:${i*90};easing:easeOutBack`},P);el('a-cylinder',{radius:.085,height:.22,position:'0 .11 0',color:'#efe6cf',roughness:.95},g);el('a-cone',{'radius-bottom':.05,'radius-top':.015,height:.06,position:'0 .25 0',color:'#e2d6b8'},g);el('a-torus',{radius:.03,'radius-tubular':.006,position:'0 .235 0',rotation:'90 0 0',color:'#b4532f'},g);el('a-entity',{label:{value:'2,5 kg',color:'#3a2a10',size:.035},position:'0 .12 .087'},g)}
+  el('a-entity',{label:{value:`${arJiwa} jiwa x 2,5 kg = ${(arJiwa*2.5).toLocaleString('id-ID')} kg beras`,color:'#f2b632',size:.075},position:'0 .55 0'},P);
+  $('arInfo').innerHTML=`<span>Jumlah jiwa</span><button class="btn" id="arM">−</button><b>${arJiwa}</b><button class="btn" id="arP">+</button><span class="tag">${(arJiwa*3.5).toLocaleString('id-ID')} liter · ${rp(arJiwa*ACUAN.fitrahRp)}</span>`;
+  $('arM').onclick=()=>{arJiwa=Math.max(1,arJiwa-1);arBuild()};$('arP').onclick=()=>{arJiwa=Math.min(16,arJiwa+1);arBuild()};
+ }
+ if(arObj==='asnaf'){
+  el('a-cylinder',{radius:.14,height:.3,position:'0 .15 0',color:'#5b3a24'},P);el('a-cone',{'radius-bottom':.2,'radius-top':0,height:.18,'segments-radial':4,position:'0 .39 0',color:'#3b2a1e'},P);
+  ASNAF.forEach((a,i)=>{const t=i/8*Math.PI*2,x=Math.sin(t)*.55,z=Math.cos(t)*.55;const g=el('a-entity',{position:`${x} 0 ${z}`,rotation:`0 ${t*180/Math.PI} 0`,class:'clickable'},P);el('a-cylinder',{radius:.07,height:.18+i*.02,position:`0 ${(.18+i*.02)/2} 0`,color:a.c},g);el('a-entity',{label:{value:a.n,color:'#ffffff',size:.045},position:`0 ${.26+i*.02} 0`},g);g.addEventListener('click',()=>{$('arInfo').innerHTML=`<b style="color:${a.c}">${a.n}</b><span>${a.d}</span>`;chime(true)})});
+  $('arInfo').innerHTML='<span>Ketuk salah satu pilar untuk membaca definisi asnaf (QS. at-Taubah: 60).</span>';
+ }
+ if(arObj==='emas'){
+  const H=g=>g/85*.5;
+  el('a-box',{width:.2,height:H(85),depth:.2,position:`-.2 ${H(85)/2} 0`,material:'color:#ffffff;opacity:.18;transparent:true'},P);
+  el('a-entity',{label:{value:'Nisab 85 g',color:'#ffffff',size:.045},position:`-.2 ${H(85)+.06} 0`},P);
+  const n=Math.min(arGram,200);el('a-box',{width:.2,height:Math.max(.005,H(n)),depth:.2,position:`.2 ${H(n)/2} 0`,material:'color:#f2b632;metalness:.2;roughness:.35;emissive:#9a6a00;emissiveIntensity:.6'},P);
+  el('a-entity',{label:{value:`Simpanan ${arGram} g`,color:'#f2b632',size:.045},position:`.2 ${H(n)+.06} 0`},P);
+  const ok=arGram>=85;if(ok)el('a-ring',{'radius-inner':.6,'radius-outer':.64,rotation:'-90 0 0',position:'0 .01 0',material:'color:#5fd08a;shader:flat',animation:'property:scale;from:.9 .9 .9;to:1.08 1.08 1.08;dir:alternate;loop:true;dur:800'},P);
+  $('arInfo').innerHTML=`<span>Emas simpanan</span><input type="range" min="0" max="200" value="${arGram}" id="arG" aria-label="Gram emas"><b>${arGram} g</b><span class="tag">${ok?`Wajib (bila genap haul): ${gr(arGram*.025)}`:'Belum mencapai nisab'}</span>`;
+  $('arG').oninput=e=>{arGram=+e.target.value;arBuild()};
+ }
+ applyAR();
+}
+function applyAR(){$('arWorld').setAttribute('rotation',`0 ${arRot} 0`);$('arWorld').setAttribute('scale',`${arScale} ${arScale} ${arScale}`)}
+$('arSeg').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;arObj=b.dataset.o;[...$('arSeg').children].forEach(x=>x.classList.toggle('on',x===b));arBuild()});
+async function enterAR(){
+ closePanel();S.mode='ar';document.body.classList.add('ar');resetView();
+ $('vrWorld').setAttribute('visible',false);$('sky').setAttribute('visible',false);$('stars').setAttribute('visible',false);scene.removeAttribute('fog');
+ $('arWorld').setAttribute('visible',true);$('cam').setAttribute('look-controls','enabled',false);$('cam').setAttribute('wasd-controls','enabled',false);
+ $('rig').setAttribute('position','0 0 0');$('cam').object3D.rotation.set(-.35,0,0);$('arWorld').setAttribute('position','0 1.05 -1.6');
+ arBuild();
+ ['arVideo','arPhoto','arPlain'].forEach(i=>$(i).classList.remove('on'));
+ try{if(!navigator.mediaDevices?.getUserMedia)throw 0;stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});$('arVideo').srcObject=stream;$('arVideo').classList.add('on');toast('Kamera aktif. Objek 3D tampil di atas ruangan Anda.')}
+ catch(e){$('arPlain').classList.add('on');toast('Kamera langsung tidak diizinkan di tampilan ini. Ketuk <b>Foto latar</b> untuk memotret meja Anda, atau gunakan tombol AR (WebXR) bila tersedia.',5200)}
+}
+function exitAR(){S.mode='vr';document.body.classList.remove('ar');if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}
+ $('vrWorld').setAttribute('visible',true);$('sky').setAttribute('visible',true);$('stars').setAttribute('visible',true);scene.setAttribute('fog','type:exponential;color:#0b2326;density:0.025');
+ $('arWorld').setAttribute('visible',false);$('cam').setAttribute('look-controls','enabled',true);$('cam').setAttribute('wasd-controls','enabled',true);$('cam').object3D.rotation.set(0,0,0);resetView()}
+$('arExit').onclick=exitAR;$('arPhotoBtn').onclick=()=>$('arFile').click();
+$('arFile').onchange=e=>{const f=e.target.files[0];if(!f)return;$('arPhoto').src=URL.createObjectURL(f);['arVideo','arPlain'].forEach(i=>$(i).classList.remove('on'));$('arPhoto').classList.add('on');toast('Foto dipasang sebagai latar AR.')};
+// drag-rotate & zoom saat AR
+let drag=null;
+window.addEventListener('pointerdown',e=>{if(S.mode==='ar'&&e.target.tagName==='CANVAS')drag={x:e.clientX,r:arRot}});
+window.addEventListener('pointermove',e=>{if(drag){arRot=drag.r+(e.clientX-drag.x)*.5;applyAR()}});
+window.addEventListener('pointerup',()=>drag=null);
+window.addEventListener('wheel',e=>{if(S.mode==='ar'){arScale=Math.min(2.5,Math.max(.4,arScale-e.deltaY*.001));applyAR()}},{passive:true});
+let pinch=null;window.addEventListener('touchmove',e=>{if(S.mode!=='ar'||e.touches.length!==2)return;const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);if(pinch){arScale=Math.min(2.5,Math.max(.4,arScale*d/pinch));applyAR()}pinch=d},{passive:true});window.addEventListener('touchend',()=>pinch=null);
+
+/* ---- WebXR: VR headset & AR immersive ---- */
+scene.addEventListener('enter-vr',()=>{
+ if(scene.is('ar-mode')){$('vrWorld').setAttribute('visible',false);$('arWorld').setAttribute('visible',true);$('arWorld').setAttribute('position','0 0.9 -1.2');arBuild()}
+ else{$('gaze').setAttribute('visible',true);$('gaze').setAttribute('raycaster','enabled',true)}
+});
+scene.addEventListener('exit-vr',()=>{$('gaze').setAttribute('visible',false);$('gaze').setAttribute('raycaster','enabled',false);if(S.mode!=='ar'){$('vrWorld').setAttribute('visible',true);$('arWorld').setAttribute('visible',false)}});
+
+/* ================= START ================= */
+const start=()=>{buildWorld();renderKendi();renderDock()};
+if(scene.hasLoaded)start();else scene.addEventListener('loaded',start);
+$('goVR').onclick=()=>{$('intro').classList.remove('open');toast('Klik lapak atau penanda emas untuk memulai misi.')};
+$('goAR').onclick=()=>{$('intro').classList.remove('open');enterAR()};
+$('goYai').onclick=()=>{$('intro').classList.remove('open');openChat()};
+$('helpBtn').onclick=()=>{if(S.mode==='ar')exitAR();$('intro').classList.add('open')};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('intro').classList.contains('open'))$('intro').classList.remove('open');else closePanel()}});
+initAI();
+}
+</script>
+</body>
+</html>
