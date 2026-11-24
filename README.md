@@ -1,7 +1,7 @@
 # Sambang Zakat Gresik — Lab Imersif Filantropi Islam (VR · AR · GenAI)
 
 Media pembelajaran mata kuliah **Filantropi Islam** (Prodi PAI, Universitas Sunan Gresik).
-Pengguna "sambang" (berkunjung) ke enam lapak Pasar Bandeng Gresik dalam dunia 3D, menganalisis dan menghitung zakat, lalu menyalurkannya ke 8 asnaf, dibimbing tutor AI "Mbah Yai".
+Pengguna "sambang" (berkunjung) ke enam lapak Pasar Bandeng Gresik dalam dunia 3D, menganalisis dan menghitung zakat, lalu menyalurkannya ke 8 asnaf, dibimbing tutor AI "Bu Nyai Tika".
 
 ## Cara menerbitkan di GitHub Pages (± 5 menit, gratis)
 1. Masuk ke https://github.com, lalu klik **New repository**. Beri nama misalnya `sambang-zakat` dan atur ke **Public**.

@@ -14,7 +14,7 @@ VOICE: hangat, sabar, seperti kiai kampung yang mengajak santri sambang pasar di
 IDEA: Pasar Bandeng Gresik malam songolikur — tiap lapak adalah satu kasus zakat yang harus dianalisis.
 PICTURE: dunia 3D malam pasar: gapura paduraksa bata merah, lapak beratap limasan, lampion, masjid, bulan sabit.
 COLOUR and TYPE: malam hijau-laut tua, bata terakota, perak bandeng, aksen kunyit; Lexend untuk keterbacaan, Amiri untuk dalil.
-LAYOUT: dunia 3D penuh layar; HUD tipis di atas; panel misi di kanan (lembar bawah di ponsel); laci Mbah Yai AI.
+LAYOUT: dunia 3D penuh layar; HUD tipis di atas; panel misi di kanan (lembar bawah di ponsel); laci Bu Nyai Tika AI.
 */
 :root{color-scheme:dark;--night:#0b2326;--night2:#123438;--brick:#b4532f;--brick2:#8e3d22;--silver:#d7e1e2;--kunyit:#f2b632;--ink:#f4efe6;--muted:#a9bdbd;--ok:#5fd08a;--bad:#ff7a66;--card:rgba(9,30,33,.94);--line:rgba(215,225,226,.16)}
 *{box-sizing:border-box;min-width:0}
@@ -175,7 +175,7 @@ body.panel-open .a-enter-vr,body.panel-open .a-enter-ar{display:none}
 <aside class="panel" id="panel" aria-live="polite">
  <div class="phead"><div class="avatar" id="pAv"></div><div><h2 id="pTitle"></h2><p id="pSub"></p></div><button class="ibtn close" id="pClose" aria-label="Tutup panel">✕</button></div>
  <div class="pbody" id="pBody"></div>
- <div class="chatbar" id="chatbar" hidden><input id="chatIn" placeholder="Tanya Mbah Yai tentang zakat…" aria-label="Pertanyaan untuk Mbah Yai"><button class="btn pri" id="chatSend">Kirim</button></div>
+ <div class="chatbar" id="chatbar" hidden><input id="chatIn" placeholder="Tanya Bu Nyai Tika tentang zakat…" aria-label="Pertanyaan untuk Bu Nyai Tika"><button class="btn pri" id="chatSend">Kirim</button></div>
 </aside>
 
 <div class="modal open" id="intro" role="dialog" aria-modal="true" aria-labelledby="introT">
@@ -183,7 +183,7 @@ body.panel-open .a-enter-vr,body.panel-open .a-enter-ar{display:none}
   <div class="hero">
    <div class="ar" lang="ar">خُذْ مِنْ أَمْوَالِهِمْ صَدَقَةً تُطَهِّرُهُمْ وَتُزَكِّيهِم بِهَا</div>
    <h1 id="introT">Sambang Zakat di Pasar Bandeng Gresik</h1>
-   <p>Malam songolikur. Lampion menyala di sepanjang lapak, para penambak memamerkan bandeng kawak, dan warga bersiap menunaikan zakat. Kunjungi enam lapak, dengarkan kisah tiap muzaki dan mustahik, lalu analisis dan hitung zakatnya bersama <b>Mbah Yai</b>, pembimbing AI.</p>
+   <p>Malam songolikur. Lampion menyala di sepanjang lapak, para penambak memamerkan bandeng kawak, dan warga bersiap menunaikan zakat. Kunjungi enam lapak, dengarkan kisah tiap muzaki dan mustahik, lalu analisis dan hitung zakatnya bersama <b>Bu Nyai Tika</b>, pembimbing AI.</p>
   </div>
   <div class="mcontent">
    <b>Capaian pembelajaran (Filantropi Islam)</b>
@@ -196,7 +196,7 @@ body.panel-open .a-enter-vr,body.panel-open .a-enter-ar{display:none}
    <div class="grid3">
     <button class="mode" id="goVR"><b>Masuk Pasar (VR)</b><span>Jelajahi pasar 3D. Klik lapak atau penanda emas. Tombol VR muncul bila perangkat mendukung headset/Cardboard.</span></button>
     <button class="mode" id="goAR"><b>Mode AR</b><span>Hadirkan karung fitrah, roda 8 asnaf, dan batang emas nisab di atas meja Anda lewat kamera atau foto.</span></button>
-    <button class="mode" id="goYai"><b>Tanya Mbah Yai</b><span>Ngobrol dengan tutor AI berlogat Gresik yang membimbing dengan pertanyaan, bukan jawaban instan.</span></button>
+    <button class="mode" id="goYai"><b>Tanya Bu Nyai Tika</b><span>Ngobrol dengan tutor AI berlogat Gresik yang membimbing dengan pertanyaan, bukan jawaban instan.</span></button>
    </div>
    <p class="note">Kontrol: seret layar untuk melihat sekeliling · W A S D / tombol panah untuk berjalan · klik lapak untuk membuka misi. Angka acuan: SK Ketua BAZNAS No. 14/2026 (fitrah) dan No. 15/2026 (nisab penghasilan). Harga emas di kasus adalah asumsi; ganti dengan harga hari ini.</p>
   </div>
@@ -312,7 +312,7 @@ const save=()=>{try{localStorage.setItem('sambang-done',JSON.stringify(S.done))}
 ST.forEach(s=>S.cases[s.id]=s.base());
 
 /* ================= GENERATIVE AI LAYER ================= */
-const SYS=`Kamu adalah "Mbah Yai", kiai kampung yang ramah dari Gresik, pembimbing mata kuliah Filantropi Islam di Universitas Sunan Gresik. Gaya: hangat, sesekali menyapa "Le" atau "Nduk", memakai istilah lokal secukupnya (Pasar Bandeng, Malam Selawe, Sunan Giri, Sunan Gresik/Maulana Malik Ibrahim). Pedagogi: Sokratik — pancing dengan pertanyaan, beri petunjuk bertahap, jangan langsung memberi angka jawaban kecuali diminta setelah mahasiswa mencoba. Acuan fikih yang WAJIB dipakai: zakat fitrah 2,5 kg/3,5 liter beras per jiwa atau Rp50.000 (SK Ketua BAZNAS No.14/2026); nisab penghasilan 2026 Rp7.640.144/bulan atau Rp91.681.728/tahun, 2,5% dari bruto (SK Ketua BAZNAS No.15/2026, Fatwa MUI No.3/2003); nisab emas 85 g, haul 1 tahun, 2,5%; zakat pertanian nisab 653 kg gabah, 10% tadah hujan, 5% irigasi berbiaya, tanpa haul; zakat perniagaan/tambak = (aset lancar + piutang lancar − utang jatuh tempo) × 2,5%, aset tetap tidak dihitung; 8 asnaf QS at-Taubah:60. Bila ada perbedaan pendapat ulama, sebutkan secara adil. Jangan mengarang hadis atau nomor hadis; bila ragu katakan perlu dicek. Jawab dalam bahasa Indonesia, ringkas (maks. 120 kata) kecuali diminta panjang.`;
+const SYS=`Kamu adalah "Bu Nyai Tika", nyai (ustazah pengasuh pesantren) yang ramah dari Gresik, pembimbing mata kuliah Filantropi Islam di Universitas Sunan Gresik. Gaya: hangat, sesekali menyapa "Le" atau "Nduk", memakai istilah lokal secukupnya (Pasar Bandeng, Malam Selawe, Sunan Giri, Sunan Gresik/Maulana Malik Ibrahim). Pedagogi: Sokratik — pancing dengan pertanyaan, beri petunjuk bertahap, jangan langsung memberi angka jawaban kecuali diminta setelah mahasiswa mencoba. Acuan fikih yang WAJIB dipakai: zakat fitrah 2,5 kg/3,5 liter beras per jiwa atau Rp50.000 (SK Ketua BAZNAS No.14/2026); nisab penghasilan 2026 Rp7.640.144/bulan atau Rp91.681.728/tahun, 2,5% dari bruto (SK Ketua BAZNAS No.15/2026, Fatwa MUI No.3/2003); nisab emas 85 g, haul 1 tahun, 2,5%; zakat pertanian nisab 653 kg gabah, 10% tadah hujan, 5% irigasi berbiaya, tanpa haul; zakat perniagaan/tambak = (aset lancar + piutang lancar − utang jatuh tempo) × 2,5%, aset tetap tidak dihitung; 8 asnaf QS at-Taubah:60. Bila ada perbedaan pendapat ulama, sebutkan secara adil. Jangan mengarang hadis atau nomor hadis; bila ragu katakan perlu dicek. Jawab dalam bahasa Indonesia, ringkas (maks. 120 kata) kecuali diminta panjang.`;
 
 async function aiAsk(prompt,{onText,sys=SYS,history=null}={}){
  const msgs=history?[...history]:[{role:'user',content:prompt}];
@@ -361,7 +361,7 @@ $('sndBtn').onclick=()=>{try{AC=AC||new (window.AudioContext||window.webkitAudio
 function toast(m,ms=2600){const t=$('toast');t.innerHTML=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),ms)}
 function avatarSVG(col,fem){return `<svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="15" r="8" fill="#e0b18c"/>${fem?`<path d="M10 17a10 10 0 0 1 20 0v6H10Z" fill="${col}"/>`:`<rect x="12" y="4" width="16" height="7" rx="1.5" fill="#151515"/>`}<path d="M6 40a14 14 0 0 1 28 0Z" fill="${col}"/></svg>`}
 function renderKendi(){$('kendi').innerHTML=ST.map(s=>`<span class="coin ${S.done[s.id]?'on':''}" title="${s.t}"></span>`).join('')}
-function renderDock(){$('dock').innerHTML=ST.map(s=>`<button data-s="${s.id}" class="${S.done[s.id]?'done':''}" aria-label="Misi ${s.no}: ${s.t}"><span class="n">${S.done[s.id]?'✓':s.no}</span><span class="lbl">${s.t}</span></button>`).join('')+`<button class="main" data-x="yai">Mbah Yai AI</button><button data-x="ar">AR</button><button data-x="refleksi">Refleksi</button>`}
+function renderDock(){$('dock').innerHTML=ST.map(s=>`<button data-s="${s.id}" class="${S.done[s.id]?'done':''}" aria-label="Misi ${s.no}: ${s.t}"><span class="n">${S.done[s.id]?'✓':s.no}</span><span class="lbl">${s.t}</span></button>`).join('')+`<button class="main" data-x="yai">Bu Nyai Tika AI</button><button data-x="ar">AR</button><button data-x="refleksi">Refleksi</button>`}
 $('dock').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.s){goStation(b.dataset.s)}else if(b.dataset.x==='yai')openChat();else if(b.dataset.x==='ar')enterAR();else if(b.dataset.x==='refleksi')openRefleksi()});
 function openPanel(title,sub,av){$('pTitle').textContent=title;$('pSub').textContent=sub;$('pAv').innerHTML=av;$('panel').classList.add('open');document.body.classList.add('panel-open');$('chatbar').hidden=true}
 function closePanel(){$('panel').classList.remove('open');document.body.classList.remove('panel-open');S.cur=null}
@@ -396,20 +396,20 @@ function check(id){
  E.fields.forEach(f=>{const v=num($('f_'+f[0]).value);const tol=f[2]==='Rp'?Math.max(500,f[3]*.002):0.011;const ok=!isNaN(v)&&Math.abs(v-f[3])<=tol;ans.push(`${f[1]}: ${isNaN(v)?'(kosong)':v}`);if(!ok)allOk=false;$('f_'+f[0]).style.borderColor=ok?'#5fd08a':'#ff7a66'});
  const steps=`<ol>${E.steps.map(x=>`<li>${x}</li>`).join('')}</ol>`;
  if(allOk){$('out').innerHTML=`<div class="fb ok"><b>Tepat, barakallah!</b> Begini alur analisisnya:${steps}</div>`;complete(id)}
- else{chime(false);$('out').innerHTML=`<div class="fb bad"><b>Belum tepat.</b> Coba telaah lagi: harta mana yang masuk hitungan, apakah nisab & haul terpenuhi, berapa kadarnya?<div class="acts"><button class="btn" id="bWhy">Mbah Yai, di mana salah saya?</button><button class="btn" id="bShow">Tampilkan pembahasan</button></div></div><div id="why"></div>`;
+ else{chime(false);$('out').innerHTML=`<div class="fb bad"><b>Belum tepat.</b> Coba telaah lagi: harta mana yang masuk hitungan, apakah nisab & haul terpenuhi, berapa kadarnya?<div class="acts"><button class="btn" id="bWhy">Bu Nyai Tika, di mana salah saya?</button><button class="btn" id="bShow">Tampilkan pembahasan</button></div></div><div id="why"></div>`;
   $('bShow').onclick=()=>{$('why').innerHTML=`<div class="fb ok">${steps}</div>`};
   $('bWhy').onclick=()=>diagnose(id,ans,E)}
 }
-function aiBox(target,title){$(target).innerHTML=`<div class="ai"><div class="who">${title} <span class="tag">${S.ai.mode==='offline'?'luring':'GenAI'}</span></div><span class="t">Mbah Yai sedang menimbang…</span></div>`;return $(target).querySelector('.t')}
+function aiBox(target,title){$(target).innerHTML=`<div class="ai"><div class="who">${title} <span class="tag">${S.ai.mode==='offline'?'luring':'GenAI'}</span></div><span class="t">Bu Nyai Tika sedang menimbang…</span></div>`;return $(target).querySelector('.t')}
 async function hint(id){
- $('out').innerHTML='<div id="hintBox"></div>';const t=aiBox('hintBox','Petunjuk Mbah Yai');
+ $('out').innerHTML='<div id="hintBox"></div>';const t=aiBox('hintBox','Petunjuk Bu Nyai Tika');
  const c=S.cases[id];
  try{const r=await aiAsk(`Mahasiswa sedang mengerjakan kasus ${ST.find(s=>s.id===id).t}. Data kasus (JSON): ${JSON.stringify(c)}. Beri SATU petunjuk Sokratik bertahap (2–3 kalimat) yang mengarahkan cara berpikir, tanpa menyebut angka jawaban akhir.`,{onText:x=>t.innerHTML=md(x)});t.innerHTML=md(r)}
  catch(e){t.innerHTML=md(OFFHINT[id])}
 }
 const OFFHINT={fitrah:'Nduk, coba pilah dulu: siapa yang **hidup dan muslim saat matahari terbenam di hari terakhir Ramadan**? Lalu siapa yang zakatnya sudah ditanggung orang lain? Baru kalikan jumlah jiwa dengan takaran per jiwa.',usaha:'Le, bedakan **aset lancar** (yang diperjualbelikan) dan **aset tetap** (alat produksi). Kurangi utang yang jatuh tempo, lalu bandingkan dengan nisab 85 gram emas.',tani:'Perhatikan dua hal: apakah panen **sudah mencapai 653 kg**? Dan bagaimana sawahnya diairi — dengan biaya atau tidak? Itu menentukan 10% atau 5%.',gaji:'Menurut BAZNAS, yang dihitung penghasilan **bruto**. Apakah cicilan termasuk pengurang? Bandingkan totalnya dengan nisab bulanan 2026.',emas:'Pisahkan **emas simpanan** dari **perhiasan yang dipakai wajar**. Lalu cek dua syarat: nisab 85 g dan haul setahun.'};
 async function diagnose(id,ans,E){
- const t=aiBox('why','Diagnosis Mbah Yai');
+ const t=aiBox('why','Diagnosis Bu Nyai Tika');
  try{const r=await aiAsk(`Kasus: ${ST.find(s=>s.id===id).t}. Data: ${JSON.stringify(S.cases[id])}. Jawaban mahasiswa: ${ans.join('; ')}. Kunci jawaban yang benar (dari mesin hitung): ${E.fields.map(f=>f[1]+' = '+f[3]).join('; ')}. Langkah benar: ${E.steps.join(' | ').replace(/<[^>]+>/g,'')}. Tebak miskonsepsi paling mungkin dari jawaban mahasiswa (mis. memasukkan aset tetap, salah kadar, lupa nisab, menghitung bayi yang tidak wajib), jelaskan dengan lembut, lalu ajukan satu pertanyaan reflektif. Jangan tulis ulang semua langkah.`,{onText:x=>t.innerHTML=md(x)});t.innerHTML=md(r)}
  catch(e){t.innerHTML=md('Mode luring: bandingkan jawabanmu dengan pembahasan langkah demi langkah. Periksa terutama **harta yang tidak dihitung**, **syarat nisab/haul**, dan **kadar**.')}
 }
@@ -443,8 +443,8 @@ function renderAsnaf(s,c){
  <p class="note">Tip: buka mode AR → “Roda 8 Asnaf” untuk melihat definisi tiap asnaf secara 3D.</p>`;
  $('bCekA').onclick=()=>{let ok=0;c.kartu.forEach((k,i)=>{const v=$('sa'+i).value,g=v===k.a;if(g)ok++;$('mc'+i).className='mcard '+(g?'ok':'bad')});
   const wrong=c.kartu.map((k,i)=>({k,v:$('sa'+i).value})).filter(x=>x.v!==x.k.a);
-  $('out').innerHTML=ok===c.kartu.length?`<div class="fb ok"><b>Sempurna, ${ok}/${c.kartu.length}.</b> Penyaluran Anda tepat sasaran.</div>`:`<div class="fb bad"><b>${ok}/${c.kartu.length} tepat.</b> Kartu bertanda merah perlu ditelaah ulang. Perhatikan kata kunci: penghasilan nihil vs kurang, utang, perjalanan, status keislaman.<div class="acts"><button class="btn" id="bWhyA">Mbah Yai, jelaskan kartu yang salah</button></div></div><div id="why"></div>`;
-  if(ok===c.kartu.length)complete('asnaf');else{chime(false);$('bWhyA').onclick=async()=>{const t=aiBox('why','Penjelasan Mbah Yai');try{const r=await aiAsk(`Mahasiswa salah mengklasifikasikan mustahik berikut: ${wrong.map(x=>`"${x.k.d}" dijawab ${x.v||'kosong'}, kunci ${x.k.a}`).join('; ')}. Jelaskan singkat per kartu mengapa kuncinya tepat berdasarkan QS at-Taubah:60 dan sebutkan bila ada khilaf ulama.`,{onText:x=>t.innerHTML=md(x)});t.innerHTML=md(r)}catch(e){t.innerHTML=wrong.map(x=>{const a=ASNAF.find(a=>a.k===x.k.a);return `• <b>${a.n}</b>: ${a.d}`}).join('<br>')}}}};
+  $('out').innerHTML=ok===c.kartu.length?`<div class="fb ok"><b>Sempurna, ${ok}/${c.kartu.length}.</b> Penyaluran Anda tepat sasaran.</div>`:`<div class="fb bad"><b>${ok}/${c.kartu.length} tepat.</b> Kartu bertanda merah perlu ditelaah ulang. Perhatikan kata kunci: penghasilan nihil vs kurang, utang, perjalanan, status keislaman.<div class="acts"><button class="btn" id="bWhyA">Bu Nyai Tika, jelaskan kartu yang salah</button></div></div><div id="why"></div>`;
+  if(ok===c.kartu.length)complete('asnaf');else{chime(false);$('bWhyA').onclick=async()=>{const t=aiBox('why','Penjelasan Bu Nyai Tika');try{const r=await aiAsk(`Mahasiswa salah mengklasifikasikan mustahik berikut: ${wrong.map(x=>`"${x.k.d}" dijawab ${x.v||'kosong'}, kunci ${x.k.a}`).join('; ')}. Jelaskan singkat per kartu mengapa kuncinya tepat berdasarkan QS at-Taubah:60 dan sebutkan bila ada khilaf ulama.`,{onText:x=>t.innerHTML=md(x)});t.innerHTML=md(r)}catch(e){t.innerHTML=wrong.map(x=>{const a=ASNAF.find(a=>a.k===x.k.a);return `• <b>${a.n}</b>: ${a.d}`}).join('<br>')}}}};
  $('bSayA').onclick=()=>speak(c.cerita+' '+c.kartu.map((k,i)=>`Kartu ${i+1}. ${k.d}`).join(' '));
  $('bNewA').onclick=async()=>{const b=$('bNewA');b.disabled=true;b.textContent='Menyusun…';let nk=null;
   if(S.ai.mode!=='offline'){try{const r=await aiAsk(`Buat 8 kartu calon penerima zakat baru berlatar Kabupaten Gresik (satu untuk tiap asnaf, urutan acak, jangan sebut nama asnafnya di deskripsi). Balas HANYA JSON: {"kartu":[{"d":"deskripsi 1 kalimat","a":"fakir|miskin|amil|mualaf|riqab|gharimin|fisabilillah|ibnusabil"}]}`,{sys:'Kamu perancang soal fikih zakat yang akurat. Hindari kasus yang diperselisihkan tajam.'});const o=parseJSON(r);nk=(o.kartu||[]).filter(k=>ASNAF.some(a=>a.k===k.a)).slice(0,8).map(k=>({d:String(k.d).slice(0,200),a:k.a}));if(nk.length<6)nk=null}catch(e){nk=null}}
@@ -452,12 +452,12 @@ function renderAsnaf(s,c){
   S.cases.asnaf={...c,kartu:nk};goStation('asnaf')};
 }
 
-/* ---- chat Mbah Yai ---- */
+/* ---- chat Bu Nyai Tika ---- */
 const FAQ=[[/nisab.*(gaji|penghasilan|profesi)|(gaji|penghasilan).*nisab/i,'Nisab zakat penghasilan 2026 menurut SK Ketua BAZNAS No. 15/2026 adalah **Rp7.640.144 per bulan** (Rp91.681.728 per tahun), kadarnya 2,5% dari bruto. Nah Nduk, kalau gajimu Rp7 juta plus tunjangan Rp1 juta, sudah wajib belum?'],[/fitrah/i,'Zakat fitrah itu **2,5 kg atau 3,5 liter beras per jiwa**; BAZNAS 2026 menetapkan Rp50.000 untuk wilayah Jabodetabek, daerah lain mengikuti harga beras setempat. Wajib bagi muslim yang hidup saat terbenam matahari akhir Ramadan. Coba tebak, bayi yang lahir saat takbiran wajib tidak?'],[/emas|perhiasan/i,'Emas simpanan wajib dizakati bila **≥ 85 g dan genap setahun**, kadarnya 2,5%. Perhiasan yang dipakai wajar tidak wajib menurut jumhur, tetapi wajib menurut mazhab Hanafi. Menurutmu mana yang lebih maslahat untuk Bu Siti?'],[/tambak|bandeng|dagang|usaha|perniaga/i,'Usaha tambak yang hasilnya dijual dihitung seperti **zakat perniagaan**: (aset lancar + piutang lancar − utang jatuh tempo) × 2,5%. Kolam dan pompa tidak dihitung. Ada juga ulama yang mengqiyaskan ke zakat pertanian, jadi diskusikan ya, Le.'],[/tani|padi|gabah|panen/i,'Zakat pertanian: nisab **653 kg gabah**; kadarnya 10% kalau tadah hujan, 5% kalau irigasinya berbiaya. Dikeluarkan setiap panen, tanpa haul.'],[/asnaf|mustahik|penerima/i,'Delapan asnaf ada di QS at-Taubah: 60: fakir, miskin, amil, mualaf, riqab, gharimin, fi sabilillah, ibnu sabil. Apa bedanya fakir dan miskin menurutmu?'],[/sunan|wali|giri|gresik|malik/i,'Sunan Gresik, Maulana Malik Ibrahim, dikenal mendekati rakyat kecil lewat perdagangan, pengobatan, dan bertani. Sunan Giri melanjutkan dakwah lewat pesantren, dan dari santrinya lahir tradisi Pasar Bandeng. Filantropinya memberdayakan, tidak sekadar memberi. Bagaimana zakat produktif bisa meneruskan semangat itu?']];
 function openChat(){
- S.cur='chat';openPanel('Mbah Yai AI','Tutor Sokratik berlogat Gresik',`<svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="15" r="8" fill="#e0b18c"/><rect x="11" y="3" width="18" height="7" rx="2" fill="#f4efe6"/><path d="M14 20q6 9 12 0" fill="#f4efe6"/><path d="M6 40a14 14 0 0 1 28 0Z" fill="#2f6b4f"/></svg>`);
+ S.cur='chat';openPanel('Bu Nyai Tika AI','Tutor Sokratik berlogat Gresik',`<svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="15" r="8" fill="#e0b18c"/><path d="M20 3a12 12 0 0 0-12 13v12h24V16A12 12 0 0 0 20 3Z" fill="#2f6b4f"/><circle cx="20" cy="16" r="7.5" fill="#e0b18c"/><path d="M6 40a14 14 0 0 1 28 0Z" fill="#2f6b4f"/></svg>`);
  $('chatbar').hidden=false;
- if(!S.chat.length)S.chat.push({role:'assistant',content:'Monggo, Le, Nduk. Selamat datang di Pasar Bandeng. Mau tanya soal zakat apa malam ini? Mbah ndak langsung kasih jawaban ya, kita pikir bareng-bareng.'});
+ if(!S.chat.length)S.chat.push({role:'assistant',content:'Monggo, Le, Nduk. Selamat datang di Pasar Bandeng. Mau tanya soal zakat apa malam ini? Bu Nyai ndak langsung kasih jawaban ya, kita pikir bareng-bareng.'});
  renderChat();setTimeout(()=>$('chatIn').focus(),50);
 }
 function renderChat(){$('pBody').innerHTML=`<div class="chat"><div class="msgs">${S.chat.map(m=>`<div class="bubble ${m.role==='user'?'me':'yai'}">${md(m.content)}</div>`).join('')}</div><div class="chips">${['Apa beda fakir dan miskin?','Tambak bandeng kena zakat apa?','Bayi lahir malam takbiran wajib fitrah?','Teladan filantropi Sunan Gresik?'].map(q=>`<button>${q}</button>`).join('')}</div><button class="btn" id="chatSay">🔊 Dengar jawaban terakhir</button></div>`;
@@ -467,7 +467,7 @@ async function sendChat(q){
  const bub=[...document.querySelectorAll('.bubble.yai')].pop();
  let hist=S.chat.slice(0,-1).slice(-10);while(hist.length&&hist[0].role!=='user')hist.shift();
  try{const r=await aiAsk(null,{history:hist,onText:x=>{bub.innerHTML=md(x);$('pBody').scrollTop=1e6}});S.chat[S.chat.length-1].content=r}
- catch(e){const f=FAQ.find(f=>f[0].test(q));S.chat[S.chat.length-1].content=(f?f[1]:'Mbah sedang mode luring, Nduk. Coba tanyakan soal nisab, fitrah, emas, tambak, pertanian, asnaf, atau Sunan Gresik.')+(S.ai.mode==='offline'?'\n\n(mode luring)':'')}
+ catch(e){const f=FAQ.find(f=>f[0].test(q));S.chat[S.chat.length-1].content=(f?f[1]:'Bu Nyai sedang mode luring, Nduk. Coba tanyakan soal nisab, fitrah, emas, tambak, pertanian, asnaf, atau Sunan Gresik.')+(S.ai.mode==='offline'?'\n\n(mode luring)':'')}
  renderChat();
 }
 $('chatSend').onclick=()=>sendChat();$('chatIn').addEventListener('keydown',e=>{if(e.key==='Enter')sendChat()});
@@ -478,10 +478,10 @@ function openRefleksi(){
  const n=Object.keys(S.done).length;
  $('pBody').innerHTML=`<p class="story">Tradisi Pasar Bandeng lahir dari santri Sunan Giri yang pulang membawa oleh-oleh, sedangkan Sunan Gresik dikenal memberdayakan warga lewat dagang dan tani. <b>Pertanyaan:</b> Rancanglah satu program zakat produktif untuk desa Anda di Gresik (mis. penambak, nelayan, atau pengrajin). Siapa asnafnya, dari zakat jenis apa dananya, dan nilai keteladanan wali mana yang Anda hidupkan?</p>
  <p class="note">Misi selesai: ${n}/6</p><div class="q"><label>Jawaban refleksi (±100–200 kata)<textarea id="refIn" rows="7" style="width:100%;border-radius:10px;border:1px solid #ffffff2e;background:#0006;padding:10px;font-size:16px"></textarea></label></div>
- <div class="acts"><button class="btn pri" id="bRef">Minta umpan balik Mbah Yai</button>${n===6?'<button class="btn brick" id="bCert">Lihat sertifikat</button>':''}</div><div id="refOut"></div>`;
+ <div class="acts"><button class="btn pri" id="bRef">Minta umpan balik Bu Nyai Tika</button>${n===6?'<button class="btn brick" id="bCert">Lihat sertifikat</button>':''}</div><div id="refOut"></div>`;
  try{$('refIn').value=localStorage.getItem('sambang-ref')||''}catch(e){}
  $('refIn').oninput=e=>{try{localStorage.setItem('sambang-ref',e.target.value)}catch(_){}};
- $('bRef').onclick=async()=>{const v=$('refIn').value.trim();if(v.length<40){toast('Tulis refleksi minimal beberapa kalimat dulu, Nduk.');return}const t=aiBox('refOut','Umpan balik Mbah Yai');
+ $('bRef').onclick=async()=>{const v=$('refIn').value.trim();if(v.length<40){toast('Tulis refleksi minimal beberapa kalimat dulu, Nduk.');return}const t=aiBox('refOut','Umpan balik Bu Nyai Tika');
   try{const r=await aiAsk(`Nilai refleksi mahasiswa berikut dengan rubrik 4 aspek (skor 1–4): (1) ketepatan fikih zakat & asnaf, (2) kedalaman analisis/sintesis program, (3) integrasi nilai kearifan lokal Gresik/Wali Songo secara bermakna, (4) kelayakan & dampak. Tulis skor tiap aspek, satu kekuatan, satu saran perbaikan, dan satu pertanyaan pemantik. Refleksi: """${v.slice(0,2500)}"""`,{onText:x=>t.innerHTML=md(x)});t.innerHTML=md(r)}
   catch(e){const k=[['asnaf',/fakir|miskin|gharim|sabil|amil|mualaf|riqab/i],['jenis zakat',/fitrah|penghasilan|perniaga|tambak|pertanian|emas|mal/i],['kearifan lokal',/sunan|giri|gresik|bandeng|selawe|wali/i],['produktif/dampak',/modal|usaha|produktif|pelatihan|berdaya|mandiri/i]];t.innerHTML='Mode luring — cek kelengkapan:<br>'+k.map(([n,r])=>`${r.test(v)?'✓':'○'} ${n}`).join('<br>')}};
  if(n===6)$('bCert').onclick=cert;
